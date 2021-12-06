@@ -17,11 +17,22 @@ namespace Scrables___TDG
         private int nb_ligne = 0;
 
         #region Constructeurs
+
         public Sac_Jetons(string nom_de_fichier)
         {
             this.sac_jetons = new SortedList<string, Jeton>();
             this.ReadFile(nom_de_fichier);
         }
+
+        #endregion
+
+        #region Propriétés
+
+        public SortedList<string, Jeton> Sac_jetons_Get
+        {
+            get { return this.sac_jetons; }
+        }
+
         #endregion
 
         #region Méthodes
@@ -74,6 +85,7 @@ namespace Scrables___TDG
             }
         }
 
+
         /// <summary>
         /// Méthode qui permet de ré-écrire le fichier "Jetons.txt" pour d'autres parties (avec les valeurs modifiées des instances de jetons)
         /// </summary>
@@ -88,6 +100,7 @@ namespace Scrables___TDG
             }
             writer.Close();
         }
+
 
         /// <summary>
         /// Méthode pour afficher le contenu du sac_jeton !
@@ -104,8 +117,9 @@ namespace Scrables___TDG
             return descriptif;
         }
 
+
         /// <summary>
-        /// Méthode pour retirer un jeton aléatoirement du sac si le nombre_jeton != 0
+        /// Méthode pour retirer un jeton aléatoirement du sac si le nombre_jeton != 0. Il est à noter quelle retire le jeton et retourne le jeton retiré
         /// </summary>
         /// <returns></returns>
         public Jeton Retire_Jeton()
