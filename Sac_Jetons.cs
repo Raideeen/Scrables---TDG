@@ -12,7 +12,6 @@ namespace Scrables___TDG
         //Initialisation de la classe random
         Random aleatoire = new Random();
         //Variable d'instance ou champ d'instance
-        private string nom_de_fichier;
         private SortedList<string, Jeton> sac_jetons;
         private int nb_ligne = 0;
 

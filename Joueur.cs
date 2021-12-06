@@ -102,6 +102,7 @@ namespace Scrables___TDG
         {
             this.jeton_joueur.RemoveAt(jeton_joueur.IndexOf(monjeton)); //Retire le jeton "monjeton" à son index dans la liste
         }
+
         /// <summary>
         /// Fonction qui a pour but d'afficher en string la main du joueur 
         /// </summary>

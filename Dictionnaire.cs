@@ -52,20 +52,21 @@ namespace Scrables___TDG
             {
                 int nb_caractere = 0;
                 List<string> liste_caractere = new List<string>();
-                string[] tableau_caractere = ligne.Split(' ');
+                //string[] tableau_caractere = ligne.Split(' ');
                 bool probleme = false; //Variable permettant, si la ligne i du fichier pose problème quelle soit ignorée et ne provoque pas d'erreur dans l'execution du programme
                 nb_ligne++;
-                string[] liste = ligne.Split(';'); //On divise la ligne en plusieurs éléments grâce au séparateur ';'
-                for (int i = 1; i <= nb_lignes; i++) //on commence à partir d'un numéro qui correspond aux nombres de caractère de la liste à la ligne suivante
+                string[] liste = ligne.Split(' '); //On divise la ligne en plusieurs éléments grâce au séparateur ' '
+                for (int i = 0; i <= 1; i++) //on commence à partir d'un numéro qui correspond aux nombres de caractère de la liste à la ligne suivante
                 {
                     try
                     {
-                        if (i % 2 != 0)
+                        if (i % 2 == 0)
                         {
-                            nb_caractere = i;
+                            nb_caractere = Convert.ToInt32(ligne);
                         }
                         else
                         {
+                            string[] tableau_caractere = ligne.Split(' ');
                             for (int index = 0; index < tableau_caractere.Length; index++)
                             {
                                 liste_caractere.Add(tableau_caractere[index]);
@@ -77,20 +78,52 @@ namespace Scrables___TDG
                         Console.WriteLine($"L'exception est : {exception.Message} et concernait la ligne {nb_ligne} du fichier {fichier}");
                         probleme = true;
                     }
+                    ligne = lecture.ReadLine();
                 }
                 if (!probleme)
                 {
                     listeMots_taille.Add(nb_caractere, liste_caractere);
                 }
-                ligne = lecture.ReadLine();
             }
         }
+
+        public bool RechDico(string mot)
+        {
+            List<string> liste = listeMots_taille.ElementAt(listeMots_taille.IndexOfKey(mot.Length)).Value; //permet d'obtenir la liste correspondant à longueur du mot
+            return liste.Contains(mot);
+        }
+
         public string toString()
         {
             string langue_utilise = $"Le dictionnaire utilisé est ici : {langue}";
-            
-            return "";
+            string retour = "";
+            for (int i = 0; i < listeMots_taille.Count; i++)
+            {
+                int int_key = listeMots_taille.ElementAt(i).Key;
+                List<string> list_value = listeMots_taille.ElementAt(i).Value;
+                retour += $"Nombre de mots d'une longueur de {int_key} : {list_value.Count}\n";
+            }
+            return retour;
         }
+
+        //public string toString() code obsolète pour afficher tout le dictionnaire 
+        //{
+        //    string langue_utilise = $"Le dictionnaire utilisé est ici : {langue}";
+        //    string retour = "";
+        //    for (int i = 0; i < listeMots_taille.Count; i++)
+        //    {
+        //        int int_key = listeMots_taille.ElementAt(i).Key;
+        //        List<string> list_value = listeMots_taille.ElementAt(i).Value;
+        //        retour += $"Liste des mots d'une longueur de {int_key}\n";
+        //        for (int index = 0; index < listeMots_taille.ElementAt(i).Value.Count; index++)
+        //        {
+        //            retour += $"{listeMots_taille.ElementAt(i).Value[index]} ";
+        //        }
+        //        retour += "\n";
+        //    }
+        //    return retour;
+        //}
+
         /// <summary>
         /// Fonction qui permet de compter le nombre de ligne dans le fichier afin de déterminer le nombre de liste de mots avec une longueur
         /// i. Par exemple, si le fichier fait 28 lignes, on sait que d'après la structure du fichier "Langue.txt" qu'on aura 28/2 = 14 listes
@@ -104,6 +137,7 @@ namespace Scrables___TDG
             while (ligne != null)
             {
                 this.longueur_fichier++;
+                ligne = lecture.ReadLine();
             }
             lecture.Close();
         }
