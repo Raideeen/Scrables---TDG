@@ -17,6 +17,7 @@ namespace Scrables___TDG
         private List<Jeton> jeton_joueur = new List<Jeton>(7); //Les joueurs commencent avec une main courante de 7 jetons
 
         #region Constructeurs
+
         public Joueur(string nom_joueur, Sac_Jetons sac_jeton)
         {
             this.nom_joueur = nom_joueur;
@@ -29,13 +30,16 @@ namespace Scrables___TDG
             }
             this.WriteFile($"{nom_joueur}.txt"); //On créé l'instance du joueur avec les caractéristiques en début de partie
         }
+
         #endregion
 
         #region Propriétés
+
         public List<Jeton> Jeton_joueur
         {
             get { return this.jeton_joueur; }
         }
+
         #endregion
 
         #region Méthodes
@@ -64,15 +68,18 @@ namespace Scrables___TDG
             }
             writer.Close();
         }
+
         public void Add_Mot(string mot)
         {
             mot_joueur.Add(mot);
             this.WriteFile($"{nom_joueur}.txt");
         }
+
         public void Add_Score(int val)
         {
             this.score_joueur += val;
         }
+
         public void Add_main_Courante(Jeton monjeton)
         {
             //La ligne 77, 78 et 82 est une solution temporaire au fait que, quand on appelle "Add_main_Courante"
@@ -98,6 +105,7 @@ namespace Scrables___TDG
                 }
             }
         }
+
         public void Remove_Main_Courante(Jeton monjeton)
         {
             this.jeton_joueur.RemoveAt(jeton_joueur.IndexOf(monjeton)); //Retire le jeton "monjeton" à son index dans la liste

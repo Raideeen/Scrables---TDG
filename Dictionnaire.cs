@@ -11,31 +11,36 @@ namespace Scrables___TDG
     {
         //Variable d'instance ou champ d'instance
         private string langue; //Cette variable est la langue du dictionnaire. En pratique, elle représente le nom du fichier. Ex: "Français.txt"
-        private SortedList<int,List<string>> listeMots_taille;
-        //On choisi une SortedList et non un tableau pour stocker les mots d'une longueur i
-        //compris entre 2 et 15 (inclus) car on ne sait pas à l'avance le nombre de mots d'une 
-        //longueur i. De plus, on a une SortedList avec comme paramètre <int, List<string>> car le int correspond à la longueur du mot, 
-        //donc cela permet d'identifier rapidement si on veut un mot d'une longueur de 2 quelle liste on va obtenir en value. Et, 
-        //le choix d'avoir une "liste de liste" et que on peut ainsi utiliser toutes les méthodes utiles d'une liste càd "Contains", permettant de
-        //voir si un mot est présent parmi la liste de mot de longueur i. 
-        //Exemple : On cherche à savoir si le mot "boo" est présent dans le dictionnaire. On remarque qu'il a une longueur de 3, donc on va pouvoir
-        //utiliser le clé listeMots_taille.ElementAt(IndexOfKey(3)).Value pour obtenir la liste des mots d'une longueur de 3. Ensuite, on va pouvoir
-        //manipuler cette liste pour soit faire une recherche dichotomique (+ rapide) ou directement la fonction .Contains("boo"), permettant de savoir
-        //si le mot existe dans le dictionnaire.
+        private SortedList<int,List<string>> listeMots_taille; //On choisi une SortedList et non un tableau pour stocker les mots d'une longueur i
+                                                               //compris entre 2 et 15 (inclus) car on ne sait pas à l'avance le nombre de mots d'une 
+                                                               //longueur i. De plus, on a une SortedList avec comme paramètre <int, List<string>> car le int correspond à la longueur du mot, 
+                                                               //donc cela permet d'identifier rapidement si on veut un mot d'une longueur de 2 quelle liste on va obtenir en value. Et, 
+                                                               //le choix d'avoir une "liste de liste" et que on peut ainsi utiliser toutes les méthodes utiles d'une liste càd "Contains", permettant de
+                                                               //voir si un mot est présent parmi la liste de mot de longueur i. 
+                                                               //Exemple : On cherche à savoir si le mot "boo" est présent dans le dictionnaire. On remarque qu'il a une longueur de 3, donc on va pouvoir
+                                                               //utiliser le clé listeMots_taille.ElementAt(IndexOfKey(3)).Value pour obtenir la liste des mots d'une longueur de 3. Ensuite, on va pouvoir
+                                                               //manipuler cette liste pour soit faire une recherche dichotomique (+ rapide) ou directement la fonction .Contains("boo"), permettant de savoir
+                                                               //si le mot existe dans le dictionnaire.
         private int longueur_fichier = 0;
         private int nb_ligne = 0;
 
         #region Constructeurs
+
         public Dictionnaire(string langue)
         {
             this.langue = langue;
             this.listeMots_taille = new SortedList<int, List<string>>();
-            this.compteLigne(); //permet de donner le nombre de ligne du fichier à "longueur_fichier", qui sera utilisée dans toString();
+            this.compteLigne(); //permet de donner le nombre de ligne du fichier à "longueur_fichier", qui sera utilisée dans ReadFile();
             this.ReadFile(langue);
         }
+
         #endregion
 
         #region Méthodes
+        /// <summary>
+        /// Fonction qui permet de lire le dictionnaire "Langue.txt" et de remplir listeMots_taille qui est une SortedList de Liste
+        /// </summary>
+        /// <param name="fichier"></param>
         public void ReadFile(string fichier)
         {
             StreamReader lecture = new StreamReader(fichier);
@@ -52,10 +57,8 @@ namespace Scrables___TDG
             {
                 int nb_caractere = 0;
                 List<string> liste_caractere = new List<string>();
-                //string[] tableau_caractere = ligne.Split(' ');
                 bool probleme = false; //Variable permettant, si la ligne i du fichier pose problème quelle soit ignorée et ne provoque pas d'erreur dans l'execution du programme
                 nb_ligne++;
-                string[] liste = ligne.Split(' '); //On divise la ligne en plusieurs éléments grâce au séparateur ' '
                 for (int i = 0; i <= 1; i++) //on commence à partir d'un numéro qui correspond aux nombres de caractère de la liste à la ligne suivante
                 {
                     try
@@ -87,12 +90,16 @@ namespace Scrables___TDG
             }
         }
 
-        public bool RechDico(string mot)
+        public bool RechDico(string mot) //voir discord mp clément pour faire la recherche dichotomique récursive
         {
             List<string> liste = listeMots_taille.ElementAt(listeMots_taille.IndexOfKey(mot.Length)).Value; //permet d'obtenir la liste correspondant à longueur du mot
             return liste.Contains(mot);
         }
 
+        /// <summary>
+        /// Fonction qui permet de donner le nombre de mot de i caractères dans le dictionnaire "Langue.txt"
+        /// </summary>
+        /// <returns></returns>
         public string toString()
         {
             string langue_utilise = $"Le dictionnaire utilisé est ici : {langue}";
@@ -101,7 +108,7 @@ namespace Scrables___TDG
             {
                 int int_key = listeMots_taille.ElementAt(i).Key;
                 List<string> list_value = listeMots_taille.ElementAt(i).Value;
-                retour += $"Nombre de mots d'une longueur de {int_key} : {list_value.Count}\n";
+                retour += $"Nombre de mots d'une longueur de {int_key} caractères : {list_value.Count}\n";
             }
             return retour;
         }
@@ -127,7 +134,7 @@ namespace Scrables___TDG
         /// <summary>
         /// Fonction qui permet de compter le nombre de ligne dans le fichier afin de déterminer le nombre de liste de mots avec une longueur
         /// i. Par exemple, si le fichier fait 28 lignes, on sait que d'après la structure du fichier "Langue.txt" qu'on aura 28/2 = 14 listes
-        /// de mots de longueur différentes. Donc, cela veut dire que un fichier de 29 lignes (nombre impair) est impossible, car cela impliquerait
+        /// de mots de longueur différente. Donc, cela veut dire que un fichier de 29 lignes (nombre impair) est impossible, car cela impliquerait
         /// qu'il ne respecte pas la structure du fichier "Langue.txt".
         /// </summary>
         public void compteLigne()

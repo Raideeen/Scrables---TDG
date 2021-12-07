@@ -16,15 +16,18 @@ namespace Scrables___TDG
         
 
         #region Constructeurs
+
         public Jeton(string nom_jeton, int valeur_jeton, int nombre_jeton)
         {
             this.nom_jeton = nom_jeton;
             this.valeur_jeton = valeur_jeton;
             this.nombre_jeton = nombre_jeton;
         }
+
         #endregion
 
         #region Propriétés
+
         public string Nom_jeton
         {
             get { return this.nom_jeton; }
@@ -38,9 +41,11 @@ namespace Scrables___TDG
             get { return this.nombre_jeton; }
             set { this.nombre_jeton = value; }
         }
+
         #endregion
 
         #region Méthodes
+
         public string ToString()
         {
             string descriptif = "";
@@ -54,6 +59,7 @@ namespace Scrables___TDG
             }
             return descriptif;
         }
+
         #endregion
     }
 }

@@ -41,7 +41,7 @@ namespace Scrables___TDG
             //Console.WriteLine(test.toString());
 
             Console.WriteLine(dico.toString());
-            Console.WriteLine(dico.RechDico("test".ToUpper()));
+            Console.WriteLine(dico.RechDico("REELISAIT".ToUpper()));
 
         }
     }
