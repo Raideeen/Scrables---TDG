@@ -12,6 +12,7 @@ namespace Scrables___TDG
         //Variable d'instance ou champ d'instance
         private string nom_joueur;
         private int score_joueur = 0;
+        private string chemin_joueur;
         private Sac_Jetons sac_jeton;
         private List<string> mot_joueur = null;
         private List<Jeton> jeton_joueur = new List<Jeton>(7); //Les joueurs commencent avec une main courante de 7 jetons
@@ -22,6 +23,7 @@ namespace Scrables___TDG
         {
             this.nom_joueur = nom_joueur;
             this.sac_jeton = sac_jeton;
+            this.chemin_joueur = this.nom_joueur + ".txt";
             this.mot_joueur = new List<string>();
             for (int i = 0; i < 7; i++)
             {
@@ -30,6 +32,7 @@ namespace Scrables___TDG
             }
             this.WriteFile($"{nom_joueur}.txt"); //On créé l'instance du joueur avec les caractéristiques en début de partie
         }
+
 
         #endregion
 
