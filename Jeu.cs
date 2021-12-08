@@ -82,11 +82,14 @@ namespace Scrables___TDG
             #endregion
             Dictionnaire dictionnaire = new Dictionnaire("Francais.txt");
             Sac_Jetons sac_jetons = new Sac_Jetons("Jetons.txt");
-            Joueur Robert = new Joueur("Robert", sac_jetons);
+            Joueur Robert = new Joueur("Robert", sac_jetons, "test");
             Joueur[] joueurs = { Robert };
+            Robert.Jeton_joueur_ToString();
             Plateau monplateau = new Plateau(dictionnaire, joueurs, "InstancePlateau.txt");
             monplateau.AffichageMatriceStringBrut();
-            monplateau.WriteFile("Instancetest.txt", false);
+            monplateau.toStringCouleur();
+            //monplateau.WriteFile("Instancetest.txt", false);
+            monplateau.Test_Plateau("LUTER", 14, 2, 'h', Robert);
         }
     }
 }

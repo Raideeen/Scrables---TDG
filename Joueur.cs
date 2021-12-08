@@ -33,6 +33,15 @@ namespace Scrables___TDG
             this.WriteFile($"{nom_joueur}.txt"); //On créé l'instance du joueur avec les caractéristiques en début de partie
         }
 
+        public Joueur(string nom_joueur, Sac_Jetons sac_jeton, string test)
+        {
+            this.nom_joueur = nom_joueur;
+            this.sac_jeton = sac_jeton;
+            this.chemin_joueur = this.nom_joueur + ".txt";
+            this.mot_joueur = new List<string>();
+            jeton_joueur = sac_jeton.Retourne_liste();
+            this.WriteFile($"{nom_joueur}.txt"); //On créé l'instance du joueur avec les caractéristiques en début de partie
+        }
 
         #endregion
 
@@ -126,6 +135,17 @@ namespace Scrables___TDG
                 else s += $"{jeton_joueur[i].Nom_jeton};";
             }
             Console.WriteLine($"Voici la liste des jetons dans la main du joueur {this.nom_joueur} : {s}");
+        }
+        
+        public string Jeton_joueur_liste()
+        {
+            string s = "";
+            for (int i = 0; i < jeton_joueur.Count; i++)
+            {
+                if (i == jeton_joueur.Count - 1) s += $"{jeton_joueur[i].Nom_jeton}";
+                else s += $"{jeton_joueur[i].Nom_jeton};";
+            }
+            return s;
         }
         #endregion
     }

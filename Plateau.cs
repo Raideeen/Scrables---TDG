@@ -14,6 +14,7 @@ namespace Scrables___TDG
         private Joueur[] joueurs;
         private string InstancePlateau_chemin;
         private char[,] matrice_jeu = new char[15,15];
+        private char[,] matrice_jeu_imaginaire = new char[15, 15];
         private bool nouvelle_partie;
 
         int[,] matrice_affichage = 
@@ -102,6 +103,19 @@ namespace Scrables___TDG
 
         public void toStringCouleur()
         {
+            for (int i = 1; i <= 15 ; i++)
+            {
+                if (i<10)
+                {
+                    Console.Write(" " + i + " ");
+                }
+                else
+                {
+                    Console.Write(" " + i);
+                }
+            }
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.WriteLine();
             for (int i = 0; i < 15; i++)
             {
                 for (int j = 0; j < 15; j++)
@@ -109,29 +123,43 @@ namespace Scrables___TDG
                     switch (matrice_affichage[i, j])
                     {
                         case 0:
-                            Console.BackgroundColor = ConsoleColor.White;
+                            Console.BackgroundColor = ConsoleColor.Green;
+                            Console.Write(" " + "g" + " ");
+                            Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 1:
                             Console.BackgroundColor = ConsoleColor.DarkCyan;
+                            Console.Write(" " + "g" + " ");
+                            Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 2:
                             Console.BackgroundColor = ConsoleColor.DarkBlue;
+                            Console.Write(" " + "g" + " ");
+                            Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 3:
                             Console.BackgroundColor = ConsoleColor.Magenta;
+                            Console.Write(" " + "g" + " ");
+                            Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 4:
                             Console.BackgroundColor = ConsoleColor.Red;
+                            Console.Write(" " + "g" + " ");
+                            Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 5:
-                            Console.BackgroundColor = ConsoleColor.Green;
+                            Console.BackgroundColor = ConsoleColor.Yellow;
+                            Console.Write(" " + "g" + " ");
+                            Console.BackgroundColor = ConsoleColor.Black;
                             break;
-                    }
-                    Console.Write("  ");
-                    Console.ResetColor();
+                    }  
                 }
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(" " + (i + 1) + " ");
                 Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Black; 
             }
+            Console.WriteLine();
         }
 
         /// <summary>
@@ -151,7 +179,7 @@ namespace Scrables___TDG
                 string[] liste = ligne.Split(';');
                 for (int ligne_matrice = 0; ligne_matrice < 15; ligne_matrice++)
                 {
-                    matrice_jeu[ligne_matrice, nb_ligne] = Convert.ToChar(liste[ligne_matrice]);
+                    matrice_jeu[nb_ligne, ligne_matrice] = Convert.ToChar(liste[ligne_matrice]);
                 }
                 nb_ligne++;
                 ligne = lecture.ReadLine();
@@ -197,9 +225,156 @@ namespace Scrables___TDG
             writer.Close();
         }
 
-        public bool Test_Plateau(string mot, int ligne, int colonne, char direction)
+        /// <summary>
+        /// Fonction qui permet de copier une matrice dans une autre matrice
+        /// </summary>
+        /// <param name="matrice1">Matrice qui sera remplie</param>
+        /// <param name="matrice2">Matrice qui sera copier</param>
+        public static char[,] CopieMatrice(char[,] matrice1 ,char[,] matrice2)
         {
+            for (int ligne = 0; ligne < 15; ligne++)
+            {
+                for (int colonne = 0; colonne < 15; colonne++)
+                {
+                    matrice1[ligne, colonne] = matrice2[ligne, colonne];
+                }
+            }
+            return matrice1;
+        }
 
+        public bool Test_Plateau(string mot, int ligne, int colonne, char direction, Joueur joueur)
+        {
+            
+            //ligne et colonne représente la position du DEBUT DU MOT
+            bool possible = false;
+            string MotAvant = "";
+            string MotApres = "";
+            string MotFinal = "";
+            string motCopie = mot;
+            List<string> LettrePresente = new List<string>();
+            List<char> LettreManquante = new List<char>();
+            Queue<char> LettreManquante_sousQueue = new Queue<char>();
+            //Direction peut prendre deux valeurs 'v' pour vertical ou 'h' pour horizontal
+            
+            if (this.dictionnaire.RechDico(mot.ToUpper())) //On vérifie déjà si le mot est dans le dictionnaire, si oui alors on continue. On fait toUpper() car les mots dans le dictionnaire sont en majuscules
+            {
+                string[] Jeton_joueur_tableau = joueur.Jeton_joueur_liste().Split(';');
+                List<char> Jeton_joueur = new List<char>();
+                for (int i = 0; i < Jeton_joueur_tableau.Length; i++)
+                {
+                    Jeton_joueur.Add(Convert.ToChar(Jeton_joueur_tableau[i]));
+                }
+                if (direction == 'h')
+                {
+                    #region Test : est-ce que le joueur possède les jetons des lettres manquantes du mot ?
+                    for (int i = 0; i < mot.Length; i++) //Permet de remplir la liste LettrePresente du mot qu'on veut poser au début de la ligne et de la colonne d'entrée
+                    {
+                        if (this.matrice_jeu[ligne, colonne + i] != '_') LettrePresente.Add(Convert.ToString(this.matrice_jeu[ligne, colonne + i]));
+                    }
+                    foreach(string toRemove in LettrePresente) //permet de faire : mot - lettre_presente = lettre_manquante. On remplace les lettre présente par du vide 
+                    {
+                        motCopie = motCopie.Replace(toRemove, string.Empty);
+                    }
+                    for (int i = 0; i < motCopie.Length; i++) //On ajoute les lettres manquantes dans une list de char qu'on utilise juste après
+                    {
+                        LettreManquante.Add(Convert.ToChar(motCopie[i]));
+                    }
+                    bool tag_jeton_present = true; //Variable de test : est-ce que le joueur possède les jetons des lettres manquantes du mot
+                    for (int i = 0; i < LettreManquante.Count && tag_jeton_present; i++)
+                    {
+                        char Lettre_considere = LettreManquante[i];
+                        tag_jeton_present = Jeton_joueur.Contains(Lettre_considere);
+                    }
+                    #endregion
+
+                    if (tag_jeton_present)
+                    {
+                        this.matrice_jeu_imaginaire = CopieMatrice(matrice_jeu_imaginaire, Matrice_jeu); //On créé une matrice imaginaire ou on va placer nos lettres et essayer de voir si le mot est placable grâce à une série de test
+                        for (int index = 0; index < LettreManquante.Count; index++) //Création de la liste des lettre manquante du mot sous forme de queue. Plus simple d'utilisation pour la prochaine boucle
+                        {
+                            LettreManquante_sousQueue.Enqueue(LettreManquante[index]);
+                        }
+
+                        for (int i = 0; i < mot.Length; i++) //Boucle qui permet de remplir les cases imaginaires avec les lettres manquantes du mot
+                        {
+                            if (matrice_jeu_imaginaire[ligne, colonne + i] == '_') matrice_jeu_imaginaire[ligne, colonne + i] = LettreManquante_sousQueue.Dequeue();
+                        }
+
+                        #region Test : est-ce que la combinaison de mot créé par le placement du mot, avant et après celui-ci appartient au dictionnaire ?
+
+                        //matrice_jeu_imaginaire[14, 1] = 'C';
+                        //matrice_jeu_imaginaire[14, 0] = 'V';
+                        bool horizontalement_correct = false;
+                        bool underscore_avant = false;
+                        bool underscore_apres = false;
+                        for (int i = colonne-1; i >= 0 && !underscore_avant; i--) //On se place au début du mot, et on recule jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvant
+                        {
+                            if (matrice_jeu_imaginaire[ligne, i] == '_') underscore_avant = true;
+                            if (matrice_jeu_imaginaire[ligne, i] != '_') MotAvant += matrice_jeu_imaginaire[ligne, i]; //Evite d'avoir un '_' qui se rajoute dans le MotAvant
+                        }
+                        MotAvant = ReverseString(MotAvant); //On inverse le string car il est à l'envers
+                        for (int i = colonne + mot.Length; i < 15 && !underscore_apres; i++) //On se place à la fin du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
+                        {
+                            if (matrice_jeu_imaginaire[ligne, i] == '_') underscore_apres = true;
+                            if (matrice_jeu_imaginaire[ligne, i] != '_') MotApres += matrice_jeu_imaginaire[ligne, i]; //Evite d'avoir un '_' qui se rajoute dans le MotApres
+                        }
+                        MotFinal = MotAvant + mot + MotApres;
+                        horizontalement_correct = dictionnaire.RechDico(MotFinal); //On teste si le mot est horizontalement correct
+
+                        #endregion
+
+                        if (horizontalement_correct)
+                        {
+                            #region Test : est-ce que la combinaison de mot créé par le palcement de mot, en haut et en bas de chaque lettre appartient au dictionnaire ? 
+                            bool verticalement_correct = true;
+                            for (int i = 0; i < mot.Length && verticalement_correct; i++) //On va tester verticalement si chaque mot au dessus/au dessous de chaque lettre de notre mot qu'on veut placer forme une combinaison correcte
+                            {
+                                string MotAvantHaut = "";
+                                string MotApresBas = "";
+                                string MotFinalVertical = "";
+                                bool underscore_haut = false;
+                                bool underscore_bas = false;
+                                for (int index = ligne-1; index > 0 && !underscore_haut; index--) //On se place à la i-ème lettre du mot, et on monte jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvantHaut
+                                {
+                                    if (matrice_jeu_imaginaire[index, colonne+i] == '_') underscore_haut = true;
+                                    if (matrice_jeu_imaginaire[index, colonne+i] != '_') MotAvantHaut += matrice_jeu_imaginaire[index, colonne+i];
+                                }
+                                MotAvantHaut = ReverseString(MotAvantHaut);
+                                for (int index = ligne+1; index < 15 && !underscore_bas; index++) //On se place à la i-ème lettre du mot, et on descend jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApresBas
+                                {
+                                    if (matrice_jeu_imaginaire[index, colonne+i] == '_') underscore_bas = true;
+                                    if (matrice_jeu_imaginaire[index, colonne+i] != '_') MotApresBas += matrice_jeu_imaginaire[index, colonne+i];
+                                }
+                                MotFinalVertical = MotAvantHaut + matrice_jeu_imaginaire[ligne, colonne+i] + MotApresBas;
+                                if (MotFinalVertical.Length == 1) verticalement_correct = true; //permet d'éviter l'erreur si on a juste un mot d'une longueur 1, qui n'est pas reconnu par le dictionnaire
+                                else
+                                {
+                                    verticalement_correct = dictionnaire.RechDico(MotFinalVertical); //On teste si le mot est verticalement correct
+                                }
+                            }
+                            #endregion
+                            if (verticalement_correct) possible = true;   
+                        }
+                    }
+                }
+            }
+            return possible;
+        }
+        /// <summary>
+        /// Fonction qui permet d'inverser un string de sens. Utilisé pour le "MotAvant" dans TestPlateau
+        /// </summary>
+        /// <param name="s">String que l'on veut inverser</param>
+        /// <returns></returns>
+        public static string ReverseString(string s)
+        {
+            char[] chars = s.ToCharArray();
+            for (int i = 0, j = s.Length - 1; i < j; i++, j--)
+            {
+                char c = chars[i];
+                chars[i] = chars[j];
+                chars[j] = c;
+            }
+            return new string(chars);
         }
         #endregion
 
