@@ -86,6 +86,7 @@ namespace Scrables___TDG
             Joueur[] joueurs = { Robert };
             Plateau monplateau = new Plateau(dictionnaire, joueurs, "InstancePlateau.txt");
             monplateau.AffichageMatriceStringBrut();
+            monplateau.WriteFile("Instancetest.txt", false);
         }
     }
 }

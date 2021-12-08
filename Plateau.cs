@@ -46,6 +46,7 @@ namespace Scrables___TDG
             this.InstancePlateau_chemin = InstancePlateau_chemin;
             this.ReadFile(InstancePlateau_chemin);
         }
+
         #region Propriétés 
 
         public char[,] Matrice_jeu
@@ -133,6 +134,12 @@ namespace Scrables___TDG
             }
         }
 
+        /// <summary>
+        /// Fonction permettant de lire un fichier "InstancePlateau.txt" et créé une matrice de char[15,15] à partir de celle-ci
+        /// pour la manipulation dans le programme
+        /// </summary>
+        /// <param name="fichier">Variable indiquant le chemin du fichier et son nom. Si pas de chemin spécifié écrire seulement
+        /// le nom du fichier et il sera créé dans le répertoire "bin\Debug\net5.0" de la solution</param>
         public void ReadFile(string fichier)
         {
             StreamReader lecture = new StreamReader(fichier);
@@ -149,7 +156,49 @@ namespace Scrables___TDG
                 nb_ligne++;
                 ligne = lecture.ReadLine();
             }
-            //Console.WriteLine(ligne);
+        }
+
+        /// <summary>
+        /// Fonction qui permet d'écrire le fichier contenant le plateau et le placement des lettres. 
+        /// Il y a distinctions de deux cas : 
+        /// - nouvelle_partie == true : on fait un plateau vierge de mots
+        /// - nouvelle_partie == false : on écrit le plateau dans un fichier sauvegarde qui sera re-utilisé pour une autre partie
+        /// </summary>
+        /// <param name="fichier">Variable indiquant le chemin du fichier et son nom. Si pas de chemin spécifié écrire seulement
+        /// le nom du fichier et il sera créé dans le répertoire "bin\Debug\net5.0" de la solution</param>
+        /// <param name="nouvelle_partie">Variable qui permet de choisir si on créé un plateau vierge ou un plateau
+        /// de sauvegarde</param>
+        public void WriteFile(string fichier, bool nouvelle_partie)
+        {
+            StreamWriter writer = new StreamWriter(fichier);
+            
+            if (nouvelle_partie)
+            {
+                for (int ligne = 0; ligne < 15; ligne++)
+                {
+                    for (int colonne = 0; colonne < 15; colonne++)
+                    {
+                        if (colonne == 14) writer.Write("_\n");
+                        else writer.Write("_;");
+                    }
+                }
+            }
+            else
+            {
+                for (int ligne = 0; ligne < 15; ligne++)
+                {
+                    for (int colonne = 0; colonne < 15; colonne++)
+                    {
+                        if (colonne == 14) writer.Write($"{this.matrice_jeu[ligne, colonne]}\n");
+                        else writer.Write($"{this.matrice_jeu[ligne, colonne]};");
+                    }
+                }
+            }
+            writer.Close();
+        }
+
+        public bool Test_Plateau(string mot, int ligne, int colonne, char direction)
+        {
 
         }
         #endregion
