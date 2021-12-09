@@ -105,59 +105,53 @@ namespace Scrables___TDG
         {
             for (int i = 1; i <= 15 ; i++)
             {
-                if (i<10)
-                {
-                    Console.Write(" " + i + " ");
-                }
-                else
-                {
-                    Console.Write(" " + i);
-                }
+                if (i < 10) Console.Write($" {i} ");
+                else Console.Write($" {i}");
             }
-            Console.ForegroundColor = ConsoleColor.Black;
             Console.WriteLine();
             for (int i = 0; i < 15; i++)
             {
                 for (int j = 0; j < 15; j++)
                 {
+                    Console.ForegroundColor = ConsoleColor.Black;
                     switch (matrice_affichage[i, j])
                     {
                         case 0:
                             Console.BackgroundColor = ConsoleColor.Green;
-                            Console.Write(" " + "g" + " ");
+                            Console.Write($" {matrice_jeu[i, j]} ");
                             Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 1:
                             Console.BackgroundColor = ConsoleColor.DarkCyan;
-                            Console.Write(" " + "g" + " ");
+                            Console.Write($" {matrice_jeu[i, j]} ");
                             Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 2:
                             Console.BackgroundColor = ConsoleColor.DarkBlue;
-                            Console.Write(" " + "g" + " ");
+                            Console.Write($" {matrice_jeu[i, j]} ");
                             Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 3:
                             Console.BackgroundColor = ConsoleColor.Magenta;
-                            Console.Write(" " + "g" + " ");
+                            Console.Write($" {matrice_jeu[i, j]} ");
                             Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 4:
                             Console.BackgroundColor = ConsoleColor.Red;
-                            Console.Write(" " + "g" + " ");
+                            Console.Write($" {matrice_jeu[i, j]} ");
                             Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 5:
                             Console.BackgroundColor = ConsoleColor.Yellow;
-                            Console.Write(" " + "g" + " ");
+                            Console.Write(" " + $"{matrice_jeu[i, j]}" + " ");
                             Console.BackgroundColor = ConsoleColor.Black;
                             break;
                     }  
                 }
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write(" " + (i + 1) + " ");
+                Console.ForegroundColor = ConsoleColor.White; //permet d'éviter que les i soient noir sur noir
+                Console.Write($" {i+1} ");
                 Console.WriteLine();
-                Console.ForegroundColor = ConsoleColor.Black; 
+                Console.ResetColor();
             }
             Console.WriteLine();
         }
@@ -244,7 +238,8 @@ namespace Scrables___TDG
 
         public bool Test_Plateau(string mot, int ligne, int colonne, char direction, Joueur joueur)
         {
-            
+            int ligne_decalage = ligne - 1;
+            int colonne_decalage = colonne - 1;
             //ligne et colonne représente la position du DEBUT DU MOT
             bool possible = false;
             //Cas 'h'
@@ -276,7 +271,7 @@ namespace Scrables___TDG
                     #region Test : est-ce que le joueur possède les jetons des lettres manquantes du mot ?
                     for (int i = 0; i < mot.Length; i++) //Permet de remplir la liste LettrePresente du mot qu'on veut poser au début de la ligne et de la colonne d'entrée
                     {
-                        if (this.matrice_jeu[ligne, colonne + i] != '_') LettrePresente.Add(Convert.ToString(this.matrice_jeu[ligne, colonne + i]));
+                        if (this.matrice_jeu[ligne_decalage, colonne_decalage + i] != '_') LettrePresente.Add(Convert.ToString(this.matrice_jeu[ligne_decalage, colonne_decalage + i]));
                     }
                     foreach(string toRemove in LettrePresente) //permet de faire : mot - lettre_presente = lettre_manquante. On remplace les lettre présente par du vide 
                     {
@@ -303,26 +298,27 @@ namespace Scrables___TDG
 
                         for (int i = 0; i < mot.Length; i++) //Boucle qui permet de remplir les cases imaginaires avec les lettres manquantes du mot
                         {
-                            if (matrice_jeu_imaginaire[ligne, colonne + i] == '_') matrice_jeu_imaginaire[ligne, colonne + i] = LettreManquante_sousQueue.Dequeue();
+                            if (matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] == '_') matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] = LettreManquante_sousQueue.Dequeue();
                         }
 
                         #region Test : est-ce que la combinaison de mot créé par le placement du mot, avant et après celui-ci appartient au dictionnaire ?
 
                         //matrice_jeu_imaginaire[14, 1] = 'C';
                         //matrice_jeu_imaginaire[14, 0] = 'V';
+                        //matrice_jeu_imaginaire[13, 3] = 'F';
                         bool horizontalement_correct = false;
                         bool underscore_avant = false;
                         bool underscore_apres = false;
-                        for (int i = colonne-1; i >= 0 && !underscore_avant; i--) //On se place au début du mot, et on recule jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvant
+                        for (int i = colonne_decalage-1; i >= 0 && !underscore_avant; i--) //On se place au début du mot, et on recule jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvant
                         {
-                            if (matrice_jeu_imaginaire[ligne, i] == '_') underscore_avant = true;
-                            if (matrice_jeu_imaginaire[ligne, i] != '_') MotAvant_h += matrice_jeu_imaginaire[ligne, i]; //Evite d'avoir un '_' qui se rajoute dans le MotAvant
+                            if (matrice_jeu_imaginaire[ligne_decalage, i] == '_') underscore_avant = true;
+                            if (matrice_jeu_imaginaire[ligne_decalage, i] != '_') MotAvant_h += matrice_jeu_imaginaire[ligne_decalage, i]; //Evite d'avoir un '_' qui se rajoute dans le MotAvant
                         }
                         MotAvant_h = ReverseString(MotAvant_h); //On inverse le string car il est à l'envers
-                        for (int i = colonne + mot.Length; i < 15 && !underscore_apres; i++) //On se place à la fin du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
+                        for (int i = colonne_decalage + mot.Length; i < 15 && !underscore_apres; i++) //On se place à la fin du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
                         {
-                            if (matrice_jeu_imaginaire[ligne, i] == '_') underscore_apres = true;
-                            if (matrice_jeu_imaginaire[ligne, i] != '_') MotApres_h += matrice_jeu_imaginaire[ligne, i]; //Evite d'avoir un '_' qui se rajoute dans le MotApres
+                            if (matrice_jeu_imaginaire[ligne_decalage, i] == '_') underscore_apres = true;
+                            if (matrice_jeu_imaginaire[ligne_decalage, i] != '_') MotApres_h += matrice_jeu_imaginaire[ligne_decalage, i]; //Evite d'avoir un '_' qui se rajoute dans le MotApres
                         }
                         MotFinal_h = MotAvant_h + mot + MotApres_h;
                         horizontalement_correct = dictionnaire.RechDico(MotFinal_h); //On teste si le mot est horizontalement correct
@@ -340,18 +336,18 @@ namespace Scrables___TDG
                                 string MotFinalVertical = "";
                                 bool underscore_haut = false;
                                 bool underscore_bas = false;
-                                for (int index = ligne-1; index > 0 && !underscore_haut; index--) //On se place à la i-ème lettre du mot, et on monte jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvantHaut
+                                for (int index = ligne_decalage - 1; index > 0 && !underscore_haut; index--) //On se place à la i-ème lettre du mot, et on monte jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvantHaut
                                 {
-                                    if (matrice_jeu_imaginaire[index, colonne+i] == '_') underscore_haut = true;
-                                    if (matrice_jeu_imaginaire[index, colonne+i] != '_') MotAvantHaut += matrice_jeu_imaginaire[index, colonne+i];
+                                    if (matrice_jeu_imaginaire[index, colonne_decalage+i] == '_') underscore_haut = true;
+                                    if (matrice_jeu_imaginaire[index, colonne_decalage + i] != '_') MotAvantHaut += matrice_jeu_imaginaire[index, colonne_decalage+i];
                                 }
                                 MotAvantHaut = ReverseString(MotAvantHaut);
-                                for (int index = ligne+1; index < 15 && !underscore_bas; index++) //On se place à la i-ème lettre du mot, et on descend jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApresBas
+                                for (int index = ligne_decalage + 1; index < 15 && !underscore_bas; index++) //On se place à la i-ème lettre du mot, et on descend jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApresBas
                                 {
-                                    if (matrice_jeu_imaginaire[index, colonne+i] == '_') underscore_bas = true;
-                                    if (matrice_jeu_imaginaire[index, colonne+i] != '_') MotApresBas += matrice_jeu_imaginaire[index, colonne+i];
+                                    if (matrice_jeu_imaginaire[index, colonne_decalage + i] == '_') underscore_bas = true;
+                                    if (matrice_jeu_imaginaire[index, colonne_decalage + i] != '_') MotApresBas += matrice_jeu_imaginaire[index, colonne_decalage + i];
                                 }
-                                MotFinalVertical = MotAvantHaut + matrice_jeu_imaginaire[ligne, colonne+i] + MotApresBas;
+                                MotFinalVertical = MotAvantHaut + matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] + MotApresBas;
                                 if (MotFinalVertical.Length == 1) verticalement_correct = true; //permet d'éviter l'erreur si on a juste un mot d'une longueur 1, qui n'est pas reconnu par le dictionnaire
                                 else
                                 {
@@ -368,7 +364,7 @@ namespace Scrables___TDG
                     #region Test : est-ce que le joueur possède les jetons des lettres manquantes du mot ?
                     for (int i = 0; i < mot.Length; i++) //Permet de remplir la liste LettrePresente du mot qu'on veut poser au début de la ligne et de la colonne d'entrée
                     {
-                        if (this.matrice_jeu[ligne + i, colonne] != '_') LettrePresente.Add(Convert.ToString(this.matrice_jeu[ligne + i, colonne]));
+                        if (this.matrice_jeu[ligne_decalage + i, colonne_decalage] != '_') LettrePresente.Add(Convert.ToString(this.matrice_jeu[ligne_decalage + i, colonne_decalage]));
                     }
                     foreach (string toRemove in LettrePresente) //permet de faire : mot - lettre_presente = lettre_manquante. On remplace les lettre présente par du vide 
                     {
@@ -395,7 +391,7 @@ namespace Scrables___TDG
 
                         for (int i = 0; i < mot.Length; i++) //Boucle qui permet de remplir les cases imaginaires avec les lettres manquantes du mot
                         {
-                            if (matrice_jeu_imaginaire[ligne + i, colonne] == '_') matrice_jeu_imaginaire[ligne + i, colonne] = LettreManquante_sousQueue.Dequeue();
+                            if (matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] == '_') matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] = LettreManquante_sousQueue.Dequeue();
                         }
 
                         #region Test : est-ce que la combinaison de mot créé par le placement du mot, avant et après celui-ci appartient au dictionnaire ?
@@ -403,16 +399,16 @@ namespace Scrables___TDG
                         bool verticalement_correct = false;
                         bool underscore_haut = false;
                         bool underscore_bas = false;
-                        for (int i = ligne - 1; i >= 0 && !underscore_haut; i--) //On se place au début du mot, et on monte jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvantHaut
+                        for (int i = ligne_decalage - 1; i >= 0 && !underscore_haut; i--) //On se place au début du mot, et on monte jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvantHaut
                         {
-                            if (matrice_jeu_imaginaire[i, colonne] == '_') underscore_haut = true;
-                            if (matrice_jeu_imaginaire[i, colonne] != '_') MotAvantHaut_v += matrice_jeu_imaginaire[i, colonne]; //Evite d'avoir un '_' qui se rajoute dans le MotAvant
+                            if (matrice_jeu_imaginaire[i, colonne_decalage] == '_') underscore_haut = true;
+                            if (matrice_jeu_imaginaire[i, colonne_decalage] != '_') MotAvantHaut_v += matrice_jeu_imaginaire[i, colonne_decalage]; //Evite d'avoir un '_' qui se rajoute dans le MotAvant
                         }
                         MotAvantHaut_v = ReverseString(MotAvantHaut_v); //On inverse le string car il est à l'envers
-                        for (int i = ligne + mot.Length; i < 15 && !underscore_bas; i++) //On se place à la fin du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
+                        for (int i = ligne_decalage + mot.Length; i < 15 && !underscore_bas; i++) //On se place à la fin du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
                         {
-                            if (matrice_jeu_imaginaire[i, colonne] == '_') underscore_bas = true;
-                            if (matrice_jeu_imaginaire[i, colonne] != '_') MotApresBas_v += matrice_jeu_imaginaire[i, colonne]; //Evite d'avoir un '_' qui se rajoute dans le MotApresBas
+                            if (matrice_jeu_imaginaire[i, colonne_decalage] == '_') underscore_bas = true;
+                            if (matrice_jeu_imaginaire[i, colonne_decalage] != '_') MotApresBas_v += matrice_jeu_imaginaire[i, colonne_decalage]; //Evite d'avoir un '_' qui se rajoute dans le MotApresBas
                         }
                         MotFinalVertical_v = MotAvantHaut_v + mot + MotApresBas_v;
                         verticalement_correct = dictionnaire.RechDico(MotFinalVertical_v); //On teste si le mot est horizontalement correct
@@ -435,18 +431,18 @@ namespace Scrables___TDG
                                 string MotFinal = "";
                                 bool underscore_avant = false;
                                 bool underscore_apres = false;
-                                for (int index = colonne - 1; index > 0 && !underscore_avant; index--) //On se place à la i-ème lettre du mot, et on recule jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvant
+                                for (int index = colonne_decalage - 1; index > 0 && !underscore_avant; index--) //On se place à la i-ème lettre du mot, et on recule jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvant
                                 {
-                                    if (matrice_jeu_imaginaire[colonne + i, index] == '_') underscore_avant = true;
-                                    if (matrice_jeu_imaginaire[colonne + i, index] != '_') MotAvant += matrice_jeu_imaginaire[colonne + i, index];
+                                    if (matrice_jeu_imaginaire[colonne_decalage + i, index] == '_') underscore_avant = true;
+                                    if (matrice_jeu_imaginaire[colonne_decalage + i, index] != '_') MotAvant += matrice_jeu_imaginaire[colonne_decalage + i, index];
                                 }
                                 MotAvant = ReverseString(MotAvant);
-                                for (int index = colonne + 1; index < 15 && !underscore_apres; index++) //On se place à la i-ème lettre du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
+                                for (int index = colonne_decalage + 1; index < 15 && !underscore_apres; index++) //On se place à la i-ème lettre du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
                                 {
-                                    if (matrice_jeu_imaginaire[colonne + i, index] == '_') underscore_apres = true;
-                                    if (matrice_jeu_imaginaire[colonne + i, index] != '_') MotApres += matrice_jeu_imaginaire[colonne + i, index];
+                                    if (matrice_jeu_imaginaire[colonne_decalage + i, index] == '_') underscore_apres = true;
+                                    if (matrice_jeu_imaginaire[colonne_decalage + i, index] != '_') MotApres += matrice_jeu_imaginaire[colonne_decalage + i, index];
                                 }
-                                MotFinal = MotAvant + matrice_jeu_imaginaire[ligne + i, colonne] + MotApres;
+                                MotFinal = MotAvant + matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] + MotApres;
                                 if (MotFinal.Length == 1) horizontalement_correct = true; //permet d'éviter l'erreur si on a juste un mot d'une longueur 1, qui n'est pas reconnu par le dictionnaire
                                 else
                                 {
@@ -458,6 +454,10 @@ namespace Scrables___TDG
                         }
                     }
                 }
+            }
+            if (possible)
+            {
+                this.matrice_jeu = CopieMatrice(this.matrice_jeu, this.matrice_jeu_imaginaire);
             }
             return possible;
         }
