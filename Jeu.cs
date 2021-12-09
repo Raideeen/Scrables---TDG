@@ -86,10 +86,14 @@ namespace Scrables___TDG
             Joueur[] joueurs = { Robert };
             Robert.Jeton_joueur_ToString();
             Plateau monplateau = new Plateau(dictionnaire, joueurs, "InstancePlateau.txt");
-            monplateau.AffichageMatriceStringBrut();
-            monplateau.toStringCouleur();
+            //monplateau.AffichageMatriceStringBrut();
+            //monplateau.toStringCouleur();
             //monplateau.WriteFile("Instancetest.txt", false);
-            monplateau.Test_Plateau("LUTER", 14, 2, 'h', Robert);
+
+
+            Console.WriteLine(monplateau.Test_Plateau("LUTER", 14, 2, 'h', Robert));
+
+            Console.WriteLine(monplateau.Test_Plateau("VOLE", 0, 0, 'v', Robert));
         }
     }
 }

@@ -137,8 +137,8 @@ namespace Scrables___TDG
             List<Jeton> liste_retourne = new List<Jeton>(7);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("E")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("U")).Value);
-            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("A")).Value);
-            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("B")).Value);
+            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("O")).Value);
+            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("E")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("C")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("D")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("R")).Value);
