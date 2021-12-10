@@ -88,13 +88,13 @@ namespace Scrables___TDG
             Plateau monplateau = new Plateau(dictionnaire, joueurs, "InstancePlateau.txt");
             //monplateau.AffichageMatriceStringBrut();
             monplateau.toStringCouleur();
-            
 
 
+            monplateau.AffichageMatriceStringBrut();
             Console.WriteLine(monplateau.Test_Plateau("LUTER", 15, 3, 'h', Robert));
 
             Console.WriteLine(monplateau.Test_Plateau("VOLE", 1, 1, 'v', Robert));
-
+            
             monplateau.toStringCouleur();
             monplateau.WriteFile("Instancetest.txt", false);
         }

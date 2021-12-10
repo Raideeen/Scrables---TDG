@@ -246,17 +246,21 @@ namespace Scrables___TDG
             string MotAvant_h = "";
             string MotApres_h = "";
             string MotFinal_h = "";
+            int score_horizontal = 0;
             //Cas 'v'
             string MotAvantHaut_v = "";
             string MotApresBas_v = "";
             string MotFinalVertical_v = "";
+            int score_vertical = 0;
 
             string motCopie = mot;
             List<string> LettrePresente = new List<string>();
             List<char> LettreManquante = new List<char>();
             Queue<char> LettreManquante_sousQueue = new Queue<char>();
             //Direction peut prendre deux valeurs 'v' pour vertical ou 'h' pour horizontal
-            
+
+            #region Test : global 
+
             if (this.dictionnaire.RechDico(mot.ToUpper())) //On vérifie déjà si le mot est dans le dictionnaire, si oui alors on continue. On fait toUpper() car les mots dans le dictionnaire sont en majuscules
             {
                 string[] Jeton_joueur_tableau = joueur.Jeton_joueur_liste().Split(';');
@@ -273,7 +277,7 @@ namespace Scrables___TDG
                     {
                         if (this.matrice_jeu[ligne_decalage, colonne_decalage + i] != '_') LettrePresente.Add(Convert.ToString(this.matrice_jeu[ligne_decalage, colonne_decalage + i]));
                     }
-                    foreach(string toRemove in LettrePresente) //permet de faire : mot - lettre_presente = lettre_manquante. On remplace les lettre présente par du vide 
+                    foreach (string toRemove in LettrePresente) //permet de faire : mot - lettre_presente = lettre_manquante. On remplace les lettre présente par du vide 
                     {
                         motCopie = motCopie.Replace(toRemove, string.Empty);
                     }
@@ -290,7 +294,7 @@ namespace Scrables___TDG
                     #endregion
 
                     if (tag_jeton_present)
-                    {   
+                    {
                         for (int index = 0; index < LettreManquante.Count; index++) //Création de la liste des lettre manquante du mot sous forme de queue. Plus simple d'utilisation pour la prochaine boucle
                         {
                             LettreManquante_sousQueue.Enqueue(LettreManquante[index]);
@@ -309,7 +313,7 @@ namespace Scrables___TDG
                         bool horizontalement_correct = false;
                         bool underscore_avant = false;
                         bool underscore_apres = false;
-                        for (int i = colonne_decalage-1; i >= 0 && !underscore_avant; i--) //On se place au début du mot, et on recule jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvant
+                        for (int i = colonne_decalage - 1; i >= 0 && !underscore_avant; i--) //On se place au début du mot, et on recule jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvant
                         {
                             if (matrice_jeu_imaginaire[ligne_decalage, i] == '_') underscore_avant = true;
                             if (matrice_jeu_imaginaire[ligne_decalage, i] != '_') MotAvant_h += matrice_jeu_imaginaire[ligne_decalage, i]; //Evite d'avoir un '_' qui se rajoute dans le MotAvant
@@ -338,8 +342,8 @@ namespace Scrables___TDG
                                 bool underscore_bas = false;
                                 for (int index = ligne_decalage - 1; index > 0 && !underscore_haut; index--) //On se place à la i-ème lettre du mot, et on monte jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvantHaut
                                 {
-                                    if (matrice_jeu_imaginaire[index, colonne_decalage+i] == '_') underscore_haut = true;
-                                    if (matrice_jeu_imaginaire[index, colonne_decalage + i] != '_') MotAvantHaut += matrice_jeu_imaginaire[index, colonne_decalage+i];
+                                    if (matrice_jeu_imaginaire[index, colonne_decalage + i] == '_') underscore_haut = true;
+                                    if (matrice_jeu_imaginaire[index, colonne_decalage + i] != '_') MotAvantHaut += matrice_jeu_imaginaire[index, colonne_decalage + i];
                                 }
                                 MotAvantHaut = ReverseString(MotAvantHaut);
                                 for (int index = ligne_decalage + 1; index < 15 && !underscore_bas; index++) //On se place à la i-ème lettre du mot, et on descend jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApresBas
@@ -355,9 +359,10 @@ namespace Scrables___TDG
                                 }
                             }
                             #endregion
-                            if (verticalement_correct) possible = true;   
+                            if (verticalement_correct) possible = true;
                         }
                     }
+                    else Console.WriteLine("Il vous manque les jetons pour compléter le mot !");
                 }
                 else //direction == 'v'
                 {
@@ -415,11 +420,11 @@ namespace Scrables___TDG
 
                         #endregion
                         matrice_jeu_imaginaire[2, 1] = '_';
-                        matrice_jeu_imaginaire[2, 2] = '_';
-                        matrice_jeu_imaginaire[2, 3] = '_';
-                        matrice_jeu_imaginaire[2, 4] = '_';
-                        matrice_jeu_imaginaire[2, 5] = '_';
-                        matrice_jeu_imaginaire[2, 6] = '_';
+                        //matrice_jeu_imaginaire[2, 2] = '_';
+                        //matrice_jeu_imaginaire[2, 3] = '_';
+                        //matrice_jeu_imaginaire[2, 4] = '_';
+                        //matrice_jeu_imaginaire[2, 5] = '_';
+                        //matrice_jeu_imaginaire[2, 6] = '_';
                         if (verticalement_correct)
                         {
                             #region Test : est-ce que la combinaison de mot créé par le palcement de mot, en haut et en bas de chaque lettre appartient au dictionnaire ? 
@@ -453,11 +458,28 @@ namespace Scrables___TDG
                             if (horizontalement_correct) possible = true;
                         }
                     }
+                    else Console.WriteLine("Il vous manque les jetons pour compléter le mot !");
                 }
             }
-            if (possible)
+            else Console.WriteLine($"Le mot {mot} n'appartient pas au dictionnaire. (Une erreur de syntaxe ?)");
+
+            #endregion
+
+            if (possible) //On recopie la matrice_imaginaire dans la matrice_jeu 
             {
                 this.matrice_jeu = CopieMatrice(this.matrice_jeu, this.matrice_jeu_imaginaire);
+                #region Calcul du score 
+                //Cas horizontal
+                if (direction == 'h')
+                {
+
+                }
+                //Cas vertical
+                else
+                {
+
+                }
+                #endregion
             }
             return possible;
         }
