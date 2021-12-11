@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Scrables___TDG
 {
-    class Dictionnaire
+    public class Dictionnaire
     {
         //Variable d'instance ou champ d'instance
         private string langue; //Cette variable est la langue du dictionnaire. En pratique, elle représente le nom du fichier. Ex: "Français.txt"

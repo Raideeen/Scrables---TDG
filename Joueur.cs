@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Scrables___TDG
 {
-    class Joueur
+    public class Joueur
     {
         //Variable d'instance ou champ d'instance
         private string nom_joueur;

@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Scrables___TDG
 {
-    class Sac_Jetons
+    public class Sac_Jetons
     {
         //Initialisation de la classe random
         Random aleatoire = new Random();
@@ -158,7 +158,7 @@ namespace Scrables___TDG
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("O")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("E")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("*")).Value);
-            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("T")).Value);
+            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("*")).Value);
             return liste_retourne;
         }
         #endregion

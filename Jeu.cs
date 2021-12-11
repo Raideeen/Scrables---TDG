@@ -2,7 +2,7 @@
 
 namespace Scrables___TDG
 {
-    class Jeu
+    public class Jeu
     {
         static void Main(string[] args)
         {

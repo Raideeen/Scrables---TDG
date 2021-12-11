@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Scrables___TDG
 {
-    class Plateau
+    public class Plateau
     {
         //Variable d'instance ou champ d'instance
         private Dictionnaire dictionnaire;
@@ -269,7 +269,20 @@ namespace Scrables___TDG
             }
             return matrice1;
         }
-
+        /// <summary>
+        /// Fonction test_plateau qui : 
+        /// - Test si un mot est posable (vérification présent dictionnaire, vérification adjacent à un mot...)
+        /// - Vérifie si le joueur possède des jokers et si il veut les utiliser
+        /// - Retire les jetons de la main courante du joueur utilisé pour la completion d'un mot
+        /// - Le pose dans la matrice_jeu
+        /// - Calcul le score associé à la pose du mot
+        /// </summary>
+        /// <param name="mot">Mot que le joueur veut poser</param>
+        /// <param name="ligne">Ligne où LA PREMIERE LETTRE DU MOT EST</param>
+        /// <param name="colonne">Colonne où LA PREMIERE LETTRE DU MOT EST</param>
+        /// <param name="direction">Variable qui détermine si le mot doit être poser horizontalement ou verticalement</param>
+        /// <param name="joueur">Joueur qui veut poser le mot</param>
+        /// <returns></returns>
         public bool Test_Plateau(string mot, int ligne, int colonne, char direction, Joueur joueur)
         {
             int ligne_decalage = ligne - 1;
@@ -281,7 +294,6 @@ namespace Scrables___TDG
             int multiplicateur_horizontal = 1;
             int multiplicateur_vertical = 1;
             int jeton_considere_pivot = 0;
-            int position_joker = 0;
             //Cas 'h'
             string MotAvant_h = "";
             string MotApres_h = "";
@@ -296,6 +308,7 @@ namespace Scrables___TDG
             string motCopie = mot;
             List<int> PositionLettreManquante = new List<int>();
             List<int> PositionPivot = new List<int>();
+            List<int> PositionJoker = new List<int>();
             List<string> LettrePresente = new List<string>();
             List<char> LettreManquante = new List<char>();
             Queue<char> LettreManquante_sousQueue = new Queue<char>();
@@ -315,41 +328,91 @@ namespace Scrables___TDG
                 if (direction == 'h')
                 {
                     #region Joker 
-                    foreach (string element in Jeton_joueur_tableau)
+                    for (int i = 0; i < Jeton_joueur_tableau.Length; i++)
                     {
-                        for (int i = 0; i < Jeton_joueur_tableau.Length && !joker; i++)
+                        if (joueur.Jeton_joueur[i].Nom_jeton == "*")
                         {
-                            if (joueur.Jeton_joueur[i].Nom_jeton == "*")
-                            {
-                                joker = true;
-                                position_joker = i;
-                            }
+                            joker = true;
+                            PositionJoker.Add(i);
                         }
                     }
                     if (joker)
                     {
-                        Console.WriteLine("Vous possédez un joker. Voulez-vous l'utiliser ? (o/n)");
-                        string recu = Console.ReadLine();
-                        if (recu == "o")
+                        if (PositionJoker.Count == 1)
                         {
-                            bool error = true;
-                            Console.WriteLine("En quoi voulez-vous transformer votre joker ?\nExplication:\n- IMPOSSIBLE de choisir un joker pour transformer en joker.\n-Il faut rentrer seulement une lettre entre A et Z de cette manière : A");
-                            char lettre_recu = ' ';
-                            while (error)
+                            Console.WriteLine("Vous possédez un joker. Voulez-vous l'utiliser ? (o/n)");
+                            string recu = Console.ReadLine();
+                            if (recu == "o")
                             {
-                                try
+                                bool error = true;
+                                Console.WriteLine("En quoi voulez-vous transformer votre joker ?\nExplication:\n- IMPOSSIBLE de choisir un joker pour transformer en joker.\n-Il faut rentrer seulement une lettre entre A et Z de cette manière : A");
+                                char lettre_recu = ' ';
+                                while (error)
                                 {
-                                    lettre_recu = Convert.ToChar(Console.ReadLine());
-                                    if (lettre_recu.GetType().Equals(typeof(char))) error = false;
+                                    try
+                                    {
+                                        lettre_recu = Convert.ToChar(Console.ReadLine());
+                                        if (lettre_recu.GetType().Equals(typeof(char))) error = false;
+                                    }
+                                    catch
+                                    {
+                                        error = true;
+                                        Console.WriteLine("Veuillez respecter la syntaxe. (c'est un char)");
+                                    }
                                 }
-                                catch
-                                {
-                                    error = true;
-                                    Console.WriteLine("Veuillez respecter la syntaxe. (c'est un char)");
-                                }
+                                joueur.Jeton_joueur.RemoveAt(PositionJoker[0]);
+                                joueur.Jeton_joueur.Insert(PositionJoker[0], sac_jetons.Convert_To_Jeton(lettre_recu));
                             }
-                            joueur.Jeton_joueur.RemoveAt(position_joker);
-                            joueur.Jeton_joueur.Insert(position_joker, sac_jetons.Convert_To_Jeton(lettre_recu));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Vous possédez deux joker. Voulez-vous en utiliser ? (o/n)");
+                            string recu = Console.ReadLine();
+                            if (recu == "o")
+                            {
+                                bool mauvaise_conversion = false;
+                                Console.WriteLine("Combien voulez-vous en utiliser (1 ou 2): ");
+                                string nombre_recu = Console.ReadLine();
+                                int nombre_desiree = 0;
+                                if (nombre_recu == "1" || nombre_recu == "2") nombre_desiree = Convert.ToInt32(nombre_recu);
+                                else mauvaise_conversion = true; 
+                                while (mauvaise_conversion)
+                                {
+                                    Console.WriteLine("Combien voulez-vous en utiliser (1 ou 2): ");
+                                    nombre_recu = Console.ReadLine();
+                                    if (nombre_recu == "1" || nombre_recu == "2") nombre_desiree = Convert.ToInt32(nombre_recu);
+                                    else mauvaise_conversion = true;
+                                     
+                                }
+                                for (int i = 0; i < nombre_desiree; i++)
+                                {
+                                    bool error = true;
+                                    Console.WriteLine($"En quoi voulez-vous transformer votre joker n°{i+1} ?\nExplication:\n- IMPOSSIBLE de choisir un joker pour transformer en joker.\n- Il faut rentrer seulement une lettre entre A et Z de cette manière : A");
+                                    char lettre_recu = ' ';
+                                    while (error)
+                                    {
+                                        try
+                                        {
+                                            lettre_recu = Convert.ToChar(Console.ReadLine());
+                                            if (lettre_recu == '*') 
+                                            {
+                                                error = true;
+                                                Console.WriteLine("Impossible d'entrer un joker. Veuillez réessayer !");
+                                            } 
+                                            else if (lettre_recu.GetType().Equals(typeof(char))) error = false;
+                                        }
+                                        catch
+                                        {
+                                            error = true;
+                                            Console.WriteLine("Veuillez respecter la syntaxe. (c'est un char)");
+                                        }
+                                    }
+                                    Console.WriteLine("Conversion effective!");
+                                    joueur.Jeton_joueur.RemoveAt(PositionJoker[i]);
+                                    joueur.Jeton_joueur.Insert(PositionJoker[i], sac_jetons.Convert_To_Jeton(lettre_recu));
+                                }
+                                
+                            }
                         }
                     }
                     #endregion
@@ -449,47 +512,96 @@ namespace Scrables___TDG
                         else Console.WriteLine("Vous ne touchez pas un mot déjà existant!");
                     }
                     else Console.WriteLine("Il vous manque les jetons pour compléter le mot !");
-                } //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                }
                 else if (direction == 'v') //direction == 'v'
                 {
                     #region Joker 
-                    foreach (string element in Jeton_joueur_tableau)
+                    for (int i = 0; i < Jeton_joueur_tableau.Length; i++)
                     {
-                        for (int i = 0; i < Jeton_joueur_tableau.Length && !joker; i++)
+                        if (joueur.Jeton_joueur[i].Nom_jeton == "*")
                         {
-                            if (joueur.Jeton_joueur[i].Nom_jeton == "*")
-                            {
-                                joker = true;
-                                position_joker = i;
-                            }
+                            joker = true;
+                            PositionJoker.Add(i);
                         }
                     }
                     if (joker)
                     {
-                        Console.WriteLine("Vous possédez un joker. Voulez-vous l'utiliser ? (o/n)");
-                        string recu = Console.ReadLine();
-                        if (recu == "o")
+                        if (PositionJoker.Count == 1)
                         {
-                            bool error = true;
-                            Console.WriteLine("En quoi voulez-vous transformer votre joker ?\nExplication:\n- IMPOSSIBLE de choisir un joker pour transformer en joker.\n-Il faut rentrer seulement une lettre entre A et Z de cette manière : A");
-                            char lettre_recu = ' ';
-                            while (error)
+                            Console.WriteLine("Vous possédez un joker. Voulez-vous l'utiliser ? (o/n)");
+                            string recu = Console.ReadLine();
+                            if (recu == "o")
                             {
-                                try
+                                bool error = true;
+                                Console.WriteLine("En quoi voulez-vous transformer votre joker ?\nExplication:\n- IMPOSSIBLE de choisir un joker pour transformer en joker.\n-Il faut rentrer seulement une lettre entre A et Z de cette manière : A");
+                                char lettre_recu = ' ';
+                                while (error)
                                 {
-                                    lettre_recu = Convert.ToChar(Console.ReadLine());
-                                    if (lettre_recu.GetType().Equals(typeof(char))) error = false;
+                                    try
+                                    {
+                                        lettre_recu = Convert.ToChar(Console.ReadLine());
+                                        if (lettre_recu.GetType().Equals(typeof(char))) error = false;
+                                    }
+                                    catch
+                                    {
+                                        error = true;
+                                        Console.WriteLine("Veuillez respecter la syntaxe. (c'est un char)");
+                                    }
                                 }
-                                catch
-                                {
-                                    error = true;
-                                    Console.WriteLine("Veuillez respecter la syntaxe. (c'est un char)");
-                                }
+                                joueur.Jeton_joueur.RemoveAt(PositionJoker[0]);
+                                joueur.Jeton_joueur.Insert(PositionJoker[0], sac_jetons.Convert_To_Jeton(lettre_recu));
                             }
-                            joueur.Jeton_joueur.RemoveAt(position_joker);
-                            joueur.Jeton_joueur.Insert(position_joker, sac_jetons.Convert_To_Jeton(lettre_recu));
                         }
+                        else
+                        {
+                            Console.WriteLine("Vous possédez deux joker. Voulez-vous en utiliser ? (o/n)");
+                            string recu = Console.ReadLine();
+                            if (recu == "o")
+                            {
+                                bool mauvaise_conversion = false;
+                                Console.WriteLine("Combien voulez-vous en utiliser (1 ou 2): ");
+                                string nombre_recu = Console.ReadLine();
+                                int nombre_desiree = 0;
+                                if (nombre_recu == "1" || nombre_recu == "2") nombre_desiree = Convert.ToInt32(nombre_recu);
+                                else mauvaise_conversion = true;
+                                while (mauvaise_conversion)
+                                {
+                                    Console.WriteLine("Combien voulez-vous en utiliser (1 ou 2): ");
+                                    nombre_recu = Console.ReadLine();
+                                    if (nombre_recu == "1" || nombre_recu == "2") nombre_desiree = Convert.ToInt32(nombre_recu);
+                                    else mauvaise_conversion = true;
 
+                                }
+                                for (int i = 0; i < nombre_desiree; i++)
+                                {
+                                    bool error = true;
+                                    Console.WriteLine($"En quoi voulez-vous transformer votre joker n°{i + 1} ?\nExplication:\n- IMPOSSIBLE de choisir un joker pour transformer en joker.\n- Il faut rentrer seulement une lettre entre A et Z de cette manière : A");
+                                    char lettre_recu = ' ';
+                                    while (error)
+                                    {
+                                        try
+                                        {
+                                            lettre_recu = Convert.ToChar(Console.ReadLine());
+                                            if (lettre_recu == '*')
+                                            {
+                                                error = true;
+                                                Console.WriteLine("Impossible d'entrer un joker. Veuillez réessayer !");
+                                            }
+                                            else if (lettre_recu.GetType().Equals(typeof(char))) error = false;
+                                        }
+                                        catch
+                                        {
+                                            error = true;
+                                            Console.WriteLine("Veuillez respecter la syntaxe. (c'est un char)");
+                                        }
+                                    }
+                                    Console.WriteLine("Conversion effective!");
+                                    joueur.Jeton_joueur.RemoveAt(PositionJoker[i]);
+                                    joueur.Jeton_joueur.Insert(PositionJoker[i], sac_jetons.Convert_To_Jeton(lettre_recu));
+                                }
+
+                            }
+                        }
                     }
                     #endregion
 
@@ -615,6 +727,7 @@ namespace Scrables___TDG
                     
                 }
                 #endregion
+
                 #region Calcul du score 
                 //Cas horizontal
                 if (direction == 'h')
@@ -804,7 +917,14 @@ namespace Scrables___TDG
             }
             return new string(chars);
         }
-
+        /// <summary>
+        /// Fonction qui permet de déterminer si un mot en touche un autre. 
+        /// </summary>
+        /// <param name="mot"></param>
+        /// <param name="ligne"></param>
+        /// <param name="colonne"></param>
+        /// <param name="direction"></param>
+        /// <returns></returns>
         public bool ToucheMot(string mot ,int ligne, int colonne, char direction)
         {
             bool tag_touche = false;
@@ -989,6 +1109,7 @@ namespace Scrables___TDG
                     }
 
                 }
+               
             }
             return tag_touche;
         }
