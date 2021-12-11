@@ -57,7 +57,7 @@ namespace Scrables___TDG
             monplateau.AffichageMatriceStringBrut();
             Console.WriteLine(monplateau.Test_Plateau("LUTER", 15, 3, 'h', Robert));
 
-            Console.WriteLine(monplateau.Test_Plateau("VOLE", 1, 1, 'v', Robert));
+            Console.WriteLine(monplateau.Test_Plateau("VOLE", 1, 1, 'f', Robert));
             
             monplateau.toStringCouleur();
             monplateau.WriteFile("Instancetest.txt","InstanceScoreTest.txt", false);

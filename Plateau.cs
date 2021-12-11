@@ -299,6 +299,7 @@ namespace Scrables___TDG
             //Multiplicateur
             int multiplicateur_horizontal = 1;
             int multiplicateur_vertical = 1;
+            int jeton_considere_pivot = 0;
             //Cas 'h'
             string MotAvant_h = "";
             string MotApres_h = "";
@@ -312,6 +313,7 @@ namespace Scrables___TDG
 
             string motCopie = mot;
             List<int> PositionLettreManquante = new List<int>();
+            List<int> PositionPivot = new List<int>();
             List<string> LettrePresente = new List<string>();
             List<char> LettreManquante = new List<char>();
             Queue<char> LettreManquante_sousQueue = new Queue<char>();
@@ -369,10 +371,6 @@ namespace Scrables___TDG
                         }
 
                         #region Test : est-ce que la combinaison de mot créé par le placement du mot, avant et après celui-ci appartient au dictionnaire ?
-
-                        //matrice_jeu_imaginaire[14, 1] = 'C';
-                        //matrice_jeu_imaginaire[14, 0] = 'V';
-                        //matrice_jeu_imaginaire[13, 3] = 'F';
                         bool horizontalement_correct = false;
                         bool underscore_avant = false;
                         bool underscore_apres = false;
@@ -422,12 +420,13 @@ namespace Scrables___TDG
                                 }
                             }
                             #endregion
+
                             if (verticalement_correct) possible = true;
                         }
                     }
                     else Console.WriteLine("Il vous manque les jetons pour compléter le mot !");
                 }
-                else //direction == 'v'
+                else if (direction == 'v')//direction == 'v'
                 {
                     #region Test : est-ce que le joueur possède les jetons des lettres manquantes du mot ?
                     for (int i = 0; i < mot.Length; i++) //Permet de remplir la liste LettrePresente du mot qu'on veut poser au début de la ligne et de la colonne d'entrée
@@ -487,12 +486,7 @@ namespace Scrables___TDG
                         verticalement_correct = dictionnaire.RechDico(MotFinalVertical_v); //On teste si le mot est horizontalement correct
 
                         #endregion
-                        matrice_jeu_imaginaire[2, 1] = '_';
-                        //matrice_jeu_imaginaire[2, 2] = '_';
-                        //matrice_jeu_imaginaire[2, 3] = '_';
-                        //matrice_jeu_imaginaire[2, 4] = '_';
-                        //matrice_jeu_imaginaire[2, 5] = '_';
-                        //matrice_jeu_imaginaire[2, 6] = '_';
+
                         if (verticalement_correct)
                         {
                             #region Test : est-ce que la combinaison de mot créé par le palcement de mot, en haut et en bas de chaque lettre appartient au dictionnaire ? 
@@ -523,11 +517,14 @@ namespace Scrables___TDG
                                 }
                             }
                             #endregion
+
                             if (horizontalement_correct) possible = true;
                         }
                     }
+
                     else Console.WriteLine("Il vous manque les jetons pour compléter le mot !");
                 }
+                else Console.WriteLine("Entrez soit :\n-'h' : direction horizontale\n-'v' : direction verticale");
             }
             else Console.WriteLine($"Le mot {mot} n'appartient pas au dictionnaire. (Une erreur de syntaxe ?)");
 
@@ -543,88 +540,172 @@ namespace Scrables___TDG
                     #region Calcul des points du mot de base
                     for (int i = 0; i < mot.Length; i++) //On ajoute le score du mot de base, horizontalement SANS MUTLIPLICATEUR DE MOT
                     {
+                        bool tag_1 = false;
+                        bool tag_2 = false;
                         int jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[ligne_decalage, colonne_decalage + i])); //Récupère l'index dans le sac_jetons de la lettre considérée
                         if (matrice_score[ligne_decalage, colonne_decalage + i] == 3) multiplicateur_horizontal *= 2;
                         if (matrice_score[ligne_decalage, colonne_decalage + i] == 4) multiplicateur_horizontal *= 3;
                         if (matrice_score[ligne_decalage, colonne_decalage + i] == 1) //Si la i-ème lettre est sur un lettre compte double
                         {
                             matrice_score[ligne_decalage, colonne_decalage + i] = 5; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte double utilisée"
-                            score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton*2; //On ajoute la valeur de la lettre mutipliée par 2
+                            score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton * 2; //On ajoute la valeur de la lettre mutipliée par 2
                         }
                         if (matrice_score[ligne_decalage, colonne_decalage + i] == 2)
                         {
                             matrice_score[ligne_decalage, colonne_decalage + i] = 6; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte triple utilisée"
-                            score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton*3; //On ajoute la valeur de la lettre mutipliée par 3
+                            score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton * 3; //On ajoute la valeur de la lettre mutipliée par 3
                         }
-                        if (matrice_score[ligne_decalage, colonne_decalage + i] == 0)
+                        if ((matrice_score[ligne_decalage, colonne_decalage + i] == 3 || matrice_score[ligne_decalage, colonne_decalage + i] == 4 || matrice_score[ligne_decalage, colonne_decalage + i] == 0 || matrice_score[ligne_decalage, colonne_decalage + i] == 7 || matrice_score[ligne_decalage, colonne_decalage + i] == 8) && !tag_1 && !tag_2)
                         {
                             score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
                         }
                     }
                     #endregion
 
+                    #region Position pivot : remplissage
+                    for (int i = 0; i < PositionLettreManquante.Count; i++)
+                    {
+                        if (ligne_decalage != 14 && ligne_decalage != 0)
+                        {
+                            if (matrice_jeu[ligne_decalage - 1, PositionLettreManquante[i]] != '_') PositionPivot.Add(PositionLettreManquante[i]);
+                            if (matrice_jeu[ligne_decalage + 1, PositionLettreManquante[i]] != '_') PositionPivot.Add(PositionLettreManquante[i]);
+                        }
+                        if (ligne_decalage == 0)
+                        {
+                            if (matrice_jeu[ligne_decalage + 1, PositionLettreManquante[i]] != '_') PositionPivot.Add(PositionLettreManquante[i]);
+                        }
+                        if (ligne_decalage == 14)
+                        {
+                            if (matrice_jeu[ligne_decalage - 1, PositionLettreManquante[i]] != '_') PositionPivot.Add(PositionLettreManquante[i]);
+                        }
+                    }
+                    #endregion
+
+                    foreach (int element in PositionPivot) //Permet d'ajouter les scores des positions pivots UNE SEULE FOIS 
+                    {
+                        jeton_considere_pivot = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[ligne_decalage, element]));
+                        score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere_pivot).Value.Valeur_jeton;
+                    }
+
                     #region Calcul des points des combinaisons de nouveaux mots à partir des lettres manquantes 
-                    for (int j = 0; j < PositionLettreManquante.Count; j++) //On parcourt seulement les positions des lettres manquantes ajoutés qui forme des nouvelles combinaisons de mots SANS MUTLIPLICATEUR
+                    for (int j = 0; j < PositionPivot.Count; j++) //On parcourt seulement les positions des lettres manquantes ajoutés qui forme des nouvelles combinaisons de mots SANS MUTLIPLICATEUR
                     {
                         int jeton_considere = 0;
                         multiplicateur_vertical = 1;
                         bool underscore_haut = false;
                         bool underscore_bas = false;
+
                         for (int index = ligne_decalage - 1; index > 0 && !underscore_haut; index--) //On se place à la i-ème lettre manquante du mot, et on monte jusqu'à croiser un underscore tout en ajoutant le score de chaque lettre avec les multiplicateurs
                         {
-                            jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[index, PositionLettreManquante[j]])); //Récupère l'index dans le sac_jetons de la lettre considérée
-                            if (matrice_jeu[index, PositionLettreManquante[j]] == '_') underscore_haut = true;
-                            if (matrice_score[index, PositionLettreManquante[j]] == 3) multiplicateur_vertical *= 2;
-                            if (matrice_score[index, PositionLettreManquante[j]] == 4) multiplicateur_vertical *= 3;
-                            if (matrice_jeu[index, PositionLettreManquante[j]] != '_' && matrice_score[index, PositionLettreManquante[j]] == 1)
-                            {
-                                matrice_score[index, PositionLettreManquante[j]] = 5; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte double utilisée"
-                                score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton*2; //On ajoute la valeur de la lettre mutipliée par 2
-                            }
-                            if (matrice_jeu[index, PositionLettreManquante[j]] != '_' && matrice_score[index, PositionLettreManquante[j]] == 2)
-                            {
-                                matrice_score[index, PositionLettreManquante[j]] = 6; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte triple utilisée"
-                                score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton * 2; //On ajoute la valeur de la lettre mutipliée par 3
-                            }
-                            if (matrice_jeu[index, PositionLettreManquante[j]] != '_') score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
+                            jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[index, PositionPivot[j]])); //Récupère l'index dans le sac_jetons de la lettre considérée
+                            if (matrice_jeu[index, PositionPivot[j]] == '_') underscore_haut = true;
+                            if (matrice_score[ligne_decalage, PositionPivot[j]] == 3) multiplicateur_vertical *= 2;
+                            if (matrice_score[ligne_decalage, PositionPivot[j]] == 4) multiplicateur_vertical *= 3;
+                            if (matrice_jeu[index, PositionPivot[j]] != '_') score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
                         }
                         for (int index = ligne_decalage + 1; index < 15 && !underscore_bas; index++) //On se place à la i-ème lettre manquante du mot, et on descend jusqu'à croiser un underscore tout en ajoutant le score de chaque lettre
                         {
-                            jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[index, PositionLettreManquante[j]])); //Récupère l'index dans le sac_jetons de la lettre considérée
-                            if (matrice_jeu[index, PositionLettreManquante[j]] == '_') underscore_bas = true;
-                            if (matrice_score[index, PositionLettreManquante[j]] == 3) multiplicateur_vertical *= 2;
-                            if (matrice_score[index, PositionLettreManquante[j]] == 4) multiplicateur_vertical *= 3;
-                            if (matrice_jeu[index, PositionLettreManquante[j]] != '_' && matrice_score[index, PositionLettreManquante[j]] == 1)
-                            {
-                                matrice_score[index, PositionLettreManquante[j]] = 5; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte double utilisée"
-                                score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton * 2; //On ajoute la valeur de la lettre mutipliée par 2
-                            }
-                            if (matrice_jeu[index, PositionLettreManquante[j]] != '_' && matrice_score[index, PositionLettreManquante[j]] == 2)
-                            {
-                                matrice_score[index, PositionLettreManquante[j]] = 6; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte triple utilisée"
-                                score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton * 2; //On ajoute la valeur de la lettre mutipliée par 3
-                            }
-                            if (matrice_jeu[index, PositionLettreManquante[j]] != '_') score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
+                            jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[index, PositionPivot[j]])); //Récupère l'index dans le sac_jetons de la lettre considérée
+                            if (matrice_jeu[index, PositionPivot[j]] == '_') underscore_bas = true;
+                            if (matrice_score[index, PositionPivot[j]] == 3) multiplicateur_vertical *= 2;
+                            if (matrice_score[index, PositionPivot[j]] == 4) multiplicateur_vertical *= 3;
+                            if (matrice_jeu[index, PositionPivot[j]] != '_' && (matrice_score[index, PositionPivot[j]] == 0 || matrice_score[index, PositionPivot[j]] == 5 || matrice_score[index, PositionPivot[j]] == 6 || matrice_score[index, PositionPivot[j]] == 7 || matrice_score[index, PositionPivot[j]] == 8)) score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
                         }
                         score_vertical *= multiplicateur_vertical;
                     }
                     #endregion
-                    joueur.Add_Score(score_horizontal*multiplicateur_horizontal + score_vertical); //On ajoute le score final du joueur en multipliant vert
+
+                    joueur.Add_Score((score_horizontal * multiplicateur_horizontal) + score_vertical); //On ajoute le score final du joueur en multipliant vert
                 }
                 //Cas vertical
-                else
+                else if (direction == 'v')
                 {
-                    for (int i = 0; i < mot.Length; i++) //On ajoute le score du mot de base, verticalement 
+                    #region Calcul des points du mot de base
+                    for (int i = 0; i < mot.Length; i++) //On ajoute le score du mot de base, horizontalement SANS MUTLIPLICATEUR DE MOT
                     {
+                        bool tag_1 = false;
+                        bool tag_2 = false;
                         int jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[ligne_decalage + i, colonne_decalage])); //Récupère l'index dans le sac_jetons de la lettre considérée
-                        score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton; //On ajoute la valeur de la lettre
-                        //rajouter les conditions if (ligne_decalage == 0 && colonne_decalage + i == 0) = mot compte triple...
+                        if (matrice_score[ligne_decalage + i, colonne_decalage] == 3) multiplicateur_vertical *= 2;
+                        if (matrice_score[ligne_decalage + i, colonne_decalage] == 4) multiplicateur_vertical *= 3;
+                        if (matrice_score[ligne_decalage + i, colonne_decalage] == 1) //Si la i-ème lettre est sur un lettre compte double
+                        {
+                            tag_1 = true;
+                            matrice_score[ligne_decalage + i, colonne_decalage] = 5; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte double utilisée"
+                            score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton * 2; //On ajoute la valeur de la lettre mutipliée par 2
+                        }
+                        if (matrice_score[ligne_decalage + i, colonne_decalage] == 2)
+                        {
+                            tag_2 = true;
+                            matrice_score[ligne_decalage + i, colonne_decalage] = 6; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte triple utilisée"
+                            score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton * 3; //On ajoute la valeur de la lettre mutipliée par 3
+                        }
+                        if ((matrice_score[ligne_decalage + i, colonne_decalage] == 0 || matrice_score[ligne_decalage + i, colonne_decalage] == 3 || matrice_score[ligne_decalage + i, colonne_decalage] == 4 || matrice_score[ligne_decalage + i, colonne_decalage] == 7 || matrice_score[ligne_decalage + i, colonne_decalage] == 8) && !tag_1 && !tag_2)
+                        {
+                            score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
+                        }
                     }
-                }
+                    #endregion
+
+                    #region Position pivot : remplissage
+                    for (int i = 0; i < PositionLettreManquante.Count; i++)
+                    {
+                        if (colonne_decalage != 14 && colonne_decalage != 0)
+                        {
+                            if (matrice_jeu[PositionLettreManquante[i], colonne_decalage - 1] != '_') PositionPivot.Add(PositionLettreManquante[i]);
+                            if (matrice_jeu[PositionLettreManquante[i], colonne_decalage + 1] != '_') PositionPivot.Add(PositionLettreManquante[i]);
+                        }
+                        if (colonne_decalage == 0)
+                        {
+                            if (matrice_jeu[PositionLettreManquante[i], colonne_decalage + 1] != '_') PositionPivot.Add(PositionLettreManquante[i]);
+                        }
+                        if (colonne_decalage == 14)
+                        {
+                            if (matrice_jeu[PositionLettreManquante[i], colonne_decalage - 1] != '_') PositionPivot.Add(PositionLettreManquante[i]);
+                        }
+                    }
+                    #endregion
+
+                    foreach (int element in PositionPivot) //Permet d'ajouter les scores des positions pivots UNE SEULE FOIS 
+                    {
+                        jeton_considere_pivot = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[element, colonne_decalage]));
+                        score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere_pivot).Value.Valeur_jeton;
+                    }
+                    
+                    #region Calcul des points des combinaisons de nouveaux mots à partir des lettres manquantes 
+                    for (int j = 0; j < PositionPivot.Count; j++) //On parcourt seulement les positions des lettres manquantes ajoutés qui forme des nouvelles combinaisons de mots SANS MUTLIPLICATEUR
+                    {
+                        int jeton_considere = 0;
+                        multiplicateur_horizontal = 1;
+                        bool underscore_gauche = false;
+                        bool underscore_droite = false;
+                        for (int index = colonne_decalage - 1; index > 0 && !underscore_gauche; index--) //On se place à la i-ème lettre manquante du mot, et on va a gauche jusqu'à croiser un underscore tout en ajoutant le score de chaque lettre avec les multiplicateurs
+                        {
+                            jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[PositionPivot[j], index])); //Récupère l'index dans le sac_jetons de la lettre considérée
+                            if (matrice_jeu[PositionPivot[j], index] == '_') underscore_gauche = true;
+                            if (matrice_score[PositionPivot[j], colonne_decalage] == 3) multiplicateur_horizontal *= 2;
+                            if (matrice_score[PositionPivot[j], colonne_decalage] == 4) multiplicateur_horizontal *= 3;
+                            if (matrice_jeu[PositionPivot[j], index] != '_') score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
+                        }
+                        for (int index = colonne_decalage + 1; index < 15 && !underscore_droite; index++) //On se place à la i-ème lettre manquante du mot, et on descend jusqu'à croiser un underscore tout en ajoutant le score de chaque lettre
+                        {
+                            jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[PositionPivot[j], index])); //Récupère l'index dans le sac_jetons de la lettre considérée
+                            if (matrice_jeu[PositionPivot[j], index] == '_') underscore_droite = true;
+                            if (matrice_score[PositionPivot[j], index] == 3) multiplicateur_horizontal *= 2;
+                            if (matrice_score[PositionPivot[j], index] == 4) multiplicateur_horizontal *= 3;
+                            if (matrice_jeu[PositionPivot[j], index] != '_' && (matrice_score[PositionPivot[j], index] == 0 || matrice_score[PositionPivot[j], index] == 5 || matrice_score[PositionPivot[j], index] == 6 || matrice_score[PositionPivot[j], index] == 7 || matrice_score[PositionPivot[j], index] == 8)) score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
+                        }
+                        score_horizontal *= multiplicateur_horizontal;
+                    }
+                    #endregion
+
+                    joueur.Add_Score((score_vertical * multiplicateur_vertical) + score_horizontal); //On ajoute le score final du joueur en multipliant vert
+                }             
                 #endregion
             }
             return possible;
         }
+
         /// <summary>
         /// Fonction qui permet d'inverser un string de sens. Utilisé pour le "MotAvant" dans TestPlateau
         /// </summary>
