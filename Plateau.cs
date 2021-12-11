@@ -19,27 +19,7 @@ namespace Scrables___TDG
         private char[,] matrice_jeu_imaginaire = new char[15, 15];
         private bool nouvelle_partie;
 
-        int[,] matrice_affichage = 
-                               {
-                               { 4,0,0,1,0,0,0,4,0,0,0,1,0,0,4},
-                               { 0,3,0,0,0,2,0,0,0,2,0,0,0,3,0},
-                               { 0,0,3,0,0,0,1,0,1,0,0,0,3,0,0},
-                               { 1,0,0,3,0,0,0,1,0,0,0,3,0,0,1},
-                               { 0,0,0,0,3,0,0,0,0,0,3,0,0,0,0},
-                               { 0,2,0,0,0,2,0,0,0,2,0,0,0,2,0},
-                               { 0,0,1,0,0,0,1,0,1,0,0,0,1,0,0}, 
-                               { 4,0,0,1,0,0,0,5,0,0,0,1,0,0,4}, //On commence là 
-                               { 0,0,1,0,0,0,1,0,1,0,0,0,1,0,0},
-                               { 0,2,0,0,0,2,0,0,0,2,0,0,0,2,0},
-                               { 0,0,0,0,3,0,0,0,0,0,3,0,0,0,0},
-                               { 1,0,0,3,0,0,0,1,0,0,0,3,0,0,1},
-                               { 0,0,3,0,0,0,1,0,1,0,0,0,3,0,0},
-                               { 0,3,0,0,0,2,0,0,0,2,0,0,0,3,0},
-                               { 4,0,0,1,0,0,0,4,0,0,0,1,0,0,4}};
-                                //1 : Lettre double
-                                //2 : Lettre triple
-                                //3 : Mot compte double
-                                //4 : Mot compte triple
+        
         public Plateau(Dictionnaire dictionnaire, Joueur[] joueurs) //Constructeur d'une nouvelle partie
         {
             this.dictionnaire = dictionnaire;
@@ -69,21 +49,21 @@ namespace Scrables___TDG
 
         public void AffichageMatriceIntBrut()
         {
-            if (matrice_affichage == null || matrice_affichage.Length == 0)
+            if (matrice_score == null || matrice_score.Length == 0)
             {
                 Console.WriteLine("Matrice null ou vide");
             }
             else
             {
-                for (int ligne = 0; ligne < matrice_affichage.GetLength(0); ligne++)
+                for (int ligne = 0; ligne < matrice_score.GetLength(0); ligne++)
                 {
-                    for (int colonne = 0; colonne < matrice_affichage.GetLength(1); colonne++) //GetLength(1) récupère le nombre de case dans une colonne. 
+                    for (int colonne = 0; colonne < matrice_score.GetLength(1); colonne++) //GetLength(1) récupère le nombre de case dans une colonne. 
                     {
-                        if (matrice_affichage[ligne, colonne] < 10)
+                        if (matrice_score[ligne, colonne] < 10)
                         {
-                            Console.Write($" {matrice_affichage[ligne, colonne]} ");
+                            Console.Write($" {matrice_score[ligne, colonne]} ");
                         }
-                        else Console.Write($"{matrice_affichage[ligne, colonne]} ");
+                        else Console.Write($"{matrice_score[ligne, colonne]} ");
                     }
                     Console.Write("\n");
                 }
@@ -296,10 +276,12 @@ namespace Scrables___TDG
             int colonne_decalage = colonne - 1;
             //ligne et colonne représente la position du DEBUT DU MOT
             bool possible = false;
+            bool joker = false;
             //Multiplicateur
             int multiplicateur_horizontal = 1;
             int multiplicateur_vertical = 1;
             int jeton_considere_pivot = 0;
+            int position_joker = 0;
             //Cas 'h'
             string MotAvant_h = "";
             string MotApres_h = "";
@@ -332,6 +314,46 @@ namespace Scrables___TDG
                 this.matrice_jeu_imaginaire = CopieMatrice(matrice_jeu_imaginaire, Matrice_jeu); //On créé une matrice imaginaire ou on va placer nos lettres et essayer de voir si le mot est placable grâce à une série de test
                 if (direction == 'h')
                 {
+                    #region Joker 
+                    foreach (string element in Jeton_joueur_tableau)
+                    {
+                        for (int i = 0; i < Jeton_joueur_tableau.Length && !joker; i++)
+                        {
+                            if (joueur.Jeton_joueur[i].Nom_jeton == "*")
+                            {
+                                joker = true;
+                                position_joker = i;
+                            }
+                        }
+                    }
+                    if (joker)
+                    {
+                        Console.WriteLine("Vous possédez un joker. Voulez-vous l'utiliser ? (o/n)");
+                        string recu = Console.ReadLine();
+                        if (recu == "o")
+                        {
+                            bool error = true;
+                            Console.WriteLine("En quoi voulez-vous transformer votre joker ?\nExplication:\n- IMPOSSIBLE de choisir un joker pour transformer en joker.\n-Il faut rentrer seulement une lettre entre A et Z de cette manière : A");
+                            char lettre_recu = ' ';
+                            while (error)
+                            {
+                                try
+                                {
+                                    lettre_recu = Convert.ToChar(Console.ReadLine());
+                                    if (lettre_recu.GetType().Equals(typeof(char))) error = false;
+                                }
+                                catch
+                                {
+                                    error = true;
+                                    Console.WriteLine("Veuillez respecter la syntaxe. (c'est un char)");
+                                }
+                            }
+                            joueur.Jeton_joueur.RemoveAt(position_joker);
+                            joueur.Jeton_joueur.Insert(position_joker, sac_jetons.Convert_To_Jeton(lettre_recu));
+                        }
+                    }
+                    #endregion
+
                     #region Test : est-ce que le joueur possède les jetons des lettres manquantes du mot ?
                     for (int i = 0; i < mot.Length; i++) //Permet de remplir la liste LettrePresente du mot qu'on veut poser au début de la ligne et de la colonne d'entrée
                     {
@@ -355,78 +377,122 @@ namespace Scrables___TDG
 
                     if (tag_jeton_present)
                     {
-                        for (int index = 0; index < LettreManquante.Count; index++) //Création de la liste des lettre manquante du mot sous forme de queue. Plus simple d'utilisation pour la prochaine boucle
+                        if (ToucheMot(mot, ligne_decalage, colonne_decalage, direction))
                         {
-                            LettreManquante_sousQueue.Enqueue(LettreManquante[index]);
-                        }
-
-                        for (int i = 0; i < mot.Length; i++) //Boucle qui permet de remplir les cases imaginaires avec les lettres manquantes du mot
-                        {
-                            if (matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] == '_')
+                            for (int index = 0; index < LettreManquante.Count; index++) //Création de la liste des lettre manquante du mot sous forme de queue. Plus simple d'utilisation pour la prochaine boucle
                             {
-                                matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] = LettreManquante_sousQueue.Dequeue();
-                                PositionLettreManquante.Add(colonne_decalage + i);
+                                LettreManquante_sousQueue.Enqueue(LettreManquante[index]);
                             }
-                        }
-
-                        #region Test : est-ce que la combinaison de mot créé par le placement du mot, avant et après celui-ci appartient au dictionnaire ?
-                        bool horizontalement_correct = false;
-                        bool underscore_avant = false;
-                        bool underscore_apres = false;
-                        for (int i = colonne_decalage - 1; i >= 0 && !underscore_avant; i--) //On se place au début du mot, et on recule jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvant
-                        {
-                            if (matrice_jeu_imaginaire[ligne_decalage, i] == '_') underscore_avant = true;
-                            if (matrice_jeu_imaginaire[ligne_decalage, i] != '_') MotAvant_h += matrice_jeu_imaginaire[ligne_decalage, i]; //Evite d'avoir un '_' qui se rajoute dans le MotAvant
-                        }
-                        MotAvant_h = ReverseString(MotAvant_h); //On inverse le string car il est à l'envers
-                        for (int i = colonne_decalage + mot.Length; i < 15 && !underscore_apres; i++) //On se place à la fin du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
-                        {
-                            if (matrice_jeu_imaginaire[ligne_decalage, i] == '_') underscore_apres = true;
-                            if (matrice_jeu_imaginaire[ligne_decalage, i] != '_') MotApres_h += matrice_jeu_imaginaire[ligne_decalage, i]; //Evite d'avoir un '_' qui se rajoute dans le MotApres
-                        }
-                        MotFinal_h = MotAvant_h + mot + MotApres_h;
-                        horizontalement_correct = dictionnaire.RechDico(MotFinal_h); //On teste si le mot est horizontalement correct
-
-                        #endregion
-
-                        if (horizontalement_correct)
-                        {
-                            #region Test : est-ce que la combinaison de mot créé par le palcement de mot, en haut et en bas de chaque lettre appartient au dictionnaire ? 
-                            bool verticalement_correct = true;
-                            for (int i = 0; i < mot.Length && verticalement_correct; i++) //On va tester verticalement si chaque mot au dessus/au dessous de chaque lettre de notre mot qu'on veut placer forme une combinaison correcte
+                            for (int i = 0; i < mot.Length; i++) //Boucle qui permet de remplir les cases imaginaires avec les lettres manquantes du mot
                             {
-                                string MotAvantHaut = "";
-                                string MotApresBas = "";
-                                string MotFinalVertical = "";
-                                bool underscore_haut = false;
-                                bool underscore_bas = false;
-                                for (int index = ligne_decalage - 1; index > 0 && !underscore_haut; index--) //On se place à la i-ème lettre du mot, et on monte jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvantHaut
+                                if (matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] == '_')
                                 {
-                                    if (matrice_jeu_imaginaire[index, colonne_decalage + i] == '_') underscore_haut = true;
-                                    if (matrice_jeu_imaginaire[index, colonne_decalage + i] != '_') MotAvantHaut += matrice_jeu_imaginaire[index, colonne_decalage + i];
-                                }
-                                MotAvantHaut = ReverseString(MotAvantHaut);
-                                for (int index = ligne_decalage + 1; index < 15 && !underscore_bas; index++) //On se place à la i-ème lettre du mot, et on descend jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApresBas
-                                {
-                                    if (matrice_jeu_imaginaire[index, colonne_decalage + i] == '_') underscore_bas = true;
-                                    if (matrice_jeu_imaginaire[index, colonne_decalage + i] != '_') MotApresBas += matrice_jeu_imaginaire[index, colonne_decalage + i];
-                                }
-                                MotFinalVertical = MotAvantHaut + matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] + MotApresBas;
-                                if (MotFinalVertical.Length == 1) verticalement_correct = true; //permet d'éviter l'erreur si on a juste un mot d'une longueur 1, qui n'est pas reconnu par le dictionnaire
-                                else
-                                {
-                                    verticalement_correct = dictionnaire.RechDico(MotFinalVertical); //On teste si le mot est verticalement correct
+                                    matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] = LettreManquante_sousQueue.Dequeue();
+                                    PositionLettreManquante.Add(colonne_decalage + i);
                                 }
                             }
+
+                            #region Test : est-ce que la combinaison de mot créé par le placement du mot, avant et après celui-ci appartient au dictionnaire ?
+                            bool horizontalement_correct = false;
+                            bool underscore_avant = false;
+                            bool underscore_apres = false;
+                            for (int i = colonne_decalage - 1; i >= 0 && !underscore_avant; i--) //On se place au début du mot, et on recule jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvant
+                            {
+                                if (matrice_jeu_imaginaire[ligne_decalage, i] == '_') underscore_avant = true;
+                                if (matrice_jeu_imaginaire[ligne_decalage, i] != '_') MotAvant_h += matrice_jeu_imaginaire[ligne_decalage, i]; //Evite d'avoir un '_' qui se rajoute dans le MotAvant
+                            }
+                            MotAvant_h = ReverseString(MotAvant_h); //On inverse le string car il est à l'envers
+                            for (int i = colonne_decalage + mot.Length; i < 15 && !underscore_apres; i++) //On se place à la fin du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
+                            {
+                                if (matrice_jeu_imaginaire[ligne_decalage, i] == '_') underscore_apres = true;
+                                if (matrice_jeu_imaginaire[ligne_decalage, i] != '_') MotApres_h += matrice_jeu_imaginaire[ligne_decalage, i]; //Evite d'avoir un '_' qui se rajoute dans le MotApres
+                            }
+                            MotFinal_h = MotAvant_h + mot + MotApres_h;
+                            horizontalement_correct = dictionnaire.RechDico(MotFinal_h); //On teste si le mot est horizontalement correct
+
                             #endregion
 
-                            if (verticalement_correct) possible = true;
-                        }
+                            if (horizontalement_correct)
+                            {
+                                #region Test : est-ce que la combinaison de mot créé par le palcement de mot, en haut et en bas de chaque lettre appartient au dictionnaire ? 
+                                bool verticalement_correct = true;
+                                for (int i = 0; i < mot.Length && verticalement_correct; i++) //On va tester verticalement si chaque mot au dessus/au dessous de chaque lettre de notre mot qu'on veut placer forme une combinaison correcte
+                                {
+                                    string MotAvantHaut = "";
+                                    string MotApresBas = "";
+                                    string MotFinalVertical = "";
+                                    bool underscore_haut = false;
+                                    bool underscore_bas = false;
+                                    for (int index = ligne_decalage - 1; index > 0 && !underscore_haut; index--) //On se place à la i-ème lettre du mot, et on monte jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvantHaut
+                                    {
+                                        if (matrice_jeu_imaginaire[index, colonne_decalage + i] == '_') underscore_haut = true;
+                                        if (matrice_jeu_imaginaire[index, colonne_decalage + i] != '_') MotAvantHaut += matrice_jeu_imaginaire[index, colonne_decalage + i];
+                                    }
+                                    MotAvantHaut = ReverseString(MotAvantHaut);
+                                    for (int index = ligne_decalage + 1; index < 15 && !underscore_bas; index++) //On se place à la i-ème lettre du mot, et on descend jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApresBas
+                                    {
+                                        if (matrice_jeu_imaginaire[index, colonne_decalage + i] == '_') underscore_bas = true;
+                                        if (matrice_jeu_imaginaire[index, colonne_decalage + i] != '_') MotApresBas += matrice_jeu_imaginaire[index, colonne_decalage + i];
+                                    }
+                                    MotFinalVertical = MotAvantHaut + matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] + MotApresBas;
+                                    if (MotFinalVertical.Length == 1) verticalement_correct = true; //permet d'éviter l'erreur si on a juste un mot d'une longueur 1, qui n'est pas reconnu par le dictionnaire
+                                    else
+                                    {
+                                        verticalement_correct = dictionnaire.RechDico(MotFinalVertical); //On teste si le mot est verticalement correct
+                                    }
+                                }
+                                #endregion
+
+                                if (verticalement_correct) possible = true;
+                            }
+                        } //On vérifie que la position où on veut placer le mot touche un autre mot
+                        else Console.WriteLine("Vous ne touchez pas un mot déjà existant!");
                     }
                     else Console.WriteLine("Il vous manque les jetons pour compléter le mot !");
-                }
-                else if (direction == 'v')//direction == 'v'
+                } //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                else if (direction == 'v') //direction == 'v'
                 {
+                    #region Joker 
+                    foreach (string element in Jeton_joueur_tableau)
+                    {
+                        for (int i = 0; i < Jeton_joueur_tableau.Length && !joker; i++)
+                        {
+                            if (joueur.Jeton_joueur[i].Nom_jeton == "*")
+                            {
+                                joker = true;
+                                position_joker = i;
+                            }
+                        }
+                    }
+                    if (joker)
+                    {
+                        Console.WriteLine("Vous possédez un joker. Voulez-vous l'utiliser ? (o/n)");
+                        string recu = Console.ReadLine();
+                        if (recu == "o")
+                        {
+                            bool error = true;
+                            Console.WriteLine("En quoi voulez-vous transformer votre joker ?\nExplication:\n- IMPOSSIBLE de choisir un joker pour transformer en joker.\n-Il faut rentrer seulement une lettre entre A et Z de cette manière : A");
+                            char lettre_recu = ' ';
+                            while (error)
+                            {
+                                try
+                                {
+                                    lettre_recu = Convert.ToChar(Console.ReadLine());
+                                    if (lettre_recu.GetType().Equals(typeof(char))) error = false;
+                                }
+                                catch
+                                {
+                                    error = true;
+                                    Console.WriteLine("Veuillez respecter la syntaxe. (c'est un char)");
+                                }
+                            }
+                            joueur.Jeton_joueur.RemoveAt(position_joker);
+                            joueur.Jeton_joueur.Insert(position_joker, sac_jetons.Convert_To_Jeton(lettre_recu));
+                        }
+
+                    }
+                    #endregion
+
                     #region Test : est-ce que le joueur possède les jetons des lettres manquantes du mot ?
                     for (int i = 0; i < mot.Length; i++) //Permet de remplir la liste LettrePresente du mot qu'on veut poser au début de la ligne et de la colonne d'entrée
                     {
@@ -450,77 +516,79 @@ namespace Scrables___TDG
 
                     if (tag_jeton_present)
                     {
-                        for (int index = 0; index < LettreManquante.Count; index++) //Création de la liste des lettre manquante du mot sous forme de queue. Plus simple d'utilisation pour la prochaine boucle
+                        if (ToucheMot(mot, ligne_decalage, colonne_decalage, direction))
                         {
-                            LettreManquante_sousQueue.Enqueue(LettreManquante[index]);
-                        }
-
-                        for (int i = 0; i < mot.Length; i++) //Boucle qui permet de remplir les cases imaginaires avec les lettres manquantes du mot
-                        {
-                            if (matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] == '_')
+                            for (int index = 0; index < LettreManquante.Count; index++) //Création de la liste des lettre manquante du mot sous forme de queue. Plus simple d'utilisation pour la prochaine boucle
                             {
-                                matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] = LettreManquante_sousQueue.Dequeue();
-                                PositionLettreManquante.Add(ligne_decalage + i);
+                                LettreManquante_sousQueue.Enqueue(LettreManquante[index]);
                             }
-                            
-                        }
 
-                        #region Test : est-ce que la combinaison de mot créé par le placement du mot, avant et après celui-ci appartient au dictionnaire ?
-
-                        bool verticalement_correct = false;
-                        bool underscore_haut = false;
-                        bool underscore_bas = false;
-                        for (int i = ligne_decalage - 1; i >= 0 && !underscore_haut; i--) //On se place au début du mot, et on monte jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvantHaut
-                        {
-                            if (matrice_jeu_imaginaire[i, colonne_decalage] == '_') underscore_haut = true;
-                            if (matrice_jeu_imaginaire[i, colonne_decalage] != '_') MotAvantHaut_v += matrice_jeu_imaginaire[i, colonne_decalage]; //Evite d'avoir un '_' qui se rajoute dans le MotAvant
-                        }
-                        MotAvantHaut_v = ReverseString(MotAvantHaut_v); //On inverse le string car il est à l'envers
-                        for (int i = ligne_decalage + mot.Length; i < 15 && !underscore_bas; i++) //On se place à la fin du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
-                        {
-                            if (matrice_jeu_imaginaire[i, colonne_decalage] == '_') underscore_bas = true;
-                            if (matrice_jeu_imaginaire[i, colonne_decalage] != '_') MotApresBas_v += matrice_jeu_imaginaire[i, colonne_decalage]; //Evite d'avoir un '_' qui se rajoute dans le MotApresBas
-                        }
-                        MotFinalVertical_v = MotAvantHaut_v + mot + MotApresBas_v;
-                        verticalement_correct = dictionnaire.RechDico(MotFinalVertical_v); //On teste si le mot est horizontalement correct
-
-                        #endregion
-
-                        if (verticalement_correct)
-                        {
-                            #region Test : est-ce que la combinaison de mot créé par le palcement de mot, en haut et en bas de chaque lettre appartient au dictionnaire ? 
-                            bool horizontalement_correct = true;
-                            for (int i = 0; i < mot.Length && horizontalement_correct; i++) //On va tester verticalement si chaque mot au dessus/au dessous de chaque lettre de notre mot qu'on veut placer forme une combinaison correcte
+                            for (int i = 0; i < mot.Length; i++) //Boucle qui permet de remplir les cases imaginaires avec les lettres manquantes du mot
                             {
-                                string MotAvant = "";
-                                string MotApres = "";
-                                string MotFinal = "";
-                                bool underscore_avant = false;
-                                bool underscore_apres = false;
-                                for (int index = colonne_decalage - 1; index > 0 && !underscore_avant; index--) //On se place à la i-ème lettre du mot, et on recule jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvant
+                                if (matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] == '_')
                                 {
-                                    if (matrice_jeu_imaginaire[colonne_decalage + i, index] == '_') underscore_avant = true;
-                                    if (matrice_jeu_imaginaire[colonne_decalage + i, index] != '_') MotAvant += matrice_jeu_imaginaire[colonne_decalage + i, index];
+                                    matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] = LettreManquante_sousQueue.Dequeue();
+                                    PositionLettreManquante.Add(ligne_decalage + i);
                                 }
-                                MotAvant = ReverseString(MotAvant);
-                                for (int index = colonne_decalage + 1; index < 15 && !underscore_apres; index++) //On se place à la i-ème lettre du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
-                                {
-                                    if (matrice_jeu_imaginaire[colonne_decalage + i, index] == '_') underscore_apres = true;
-                                    if (matrice_jeu_imaginaire[colonne_decalage + i, index] != '_') MotApres += matrice_jeu_imaginaire[colonne_decalage + i, index];
-                                }
-                                MotFinal = MotAvant + matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] + MotApres;
-                                if (MotFinal.Length == 1) horizontalement_correct = true; //permet d'éviter l'erreur si on a juste un mot d'une longueur 1, qui n'est pas reconnu par le dictionnaire
-                                else
-                                {
-                                    horizontalement_correct = dictionnaire.RechDico(MotFinal); //On teste si le mot est verticalement correct
-                                }
+
                             }
+
+                            #region Test : est-ce que la combinaison de mot créé par le placement du mot, avant et après celui-ci appartient au dictionnaire ?
+
+                            bool verticalement_correct = false;
+                            bool underscore_haut = false;
+                            bool underscore_bas = false;
+                            for (int i = ligne_decalage - 1; i >= 0 && !underscore_haut; i--) //On se place au début du mot, et on monte jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvantHaut
+                            {
+                                if (matrice_jeu_imaginaire[i, colonne_decalage] == '_') underscore_haut = true;
+                                if (matrice_jeu_imaginaire[i, colonne_decalage] != '_') MotAvantHaut_v += matrice_jeu_imaginaire[i, colonne_decalage]; //Evite d'avoir un '_' qui se rajoute dans le MotAvant
+                            }
+                            MotAvantHaut_v = ReverseString(MotAvantHaut_v); //On inverse le string car il est à l'envers
+                            for (int i = ligne_decalage + mot.Length; i < 15 && !underscore_bas; i++) //On se place à la fin du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
+                            {
+                                if (matrice_jeu_imaginaire[i, colonne_decalage] == '_') underscore_bas = true;
+                                if (matrice_jeu_imaginaire[i, colonne_decalage] != '_') MotApresBas_v += matrice_jeu_imaginaire[i, colonne_decalage]; //Evite d'avoir un '_' qui se rajoute dans le MotApresBas
+                            }
+                            MotFinalVertical_v = MotAvantHaut_v + mot + MotApresBas_v;
+                            verticalement_correct = dictionnaire.RechDico(MotFinalVertical_v); //On teste si le mot est horizontalement correct
+
                             #endregion
 
-                            if (horizontalement_correct) possible = true;
+                            if (verticalement_correct)
+                            {
+                                #region Test : est-ce que la combinaison de mot créé par le palcement de mot, en haut et en bas de chaque lettre appartient au dictionnaire ? 
+                                bool horizontalement_correct = true;
+                                for (int i = 0; i < mot.Length && horizontalement_correct; i++) //On va tester verticalement si chaque mot au dessus/au dessous de chaque lettre de notre mot qu'on veut placer forme une combinaison correcte
+                                {
+                                    string MotAvant = "";
+                                    string MotApres = "";
+                                    string MotFinal = "";
+                                    bool underscore_avant = false;
+                                    bool underscore_apres = false;
+                                    for (int index = colonne_decalage - 1; index > 0 && !underscore_avant; index--) //On se place à la i-ème lettre du mot, et on recule jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvant
+                                    {
+                                        if (matrice_jeu_imaginaire[colonne_decalage + i, index] == '_') underscore_avant = true;
+                                        if (matrice_jeu_imaginaire[colonne_decalage + i, index] != '_') MotAvant += matrice_jeu_imaginaire[colonne_decalage + i, index];
+                                    }
+                                    MotAvant = ReverseString(MotAvant);
+                                    for (int index = colonne_decalage + 1; index < 15 && !underscore_apres; index++) //On se place à la i-ème lettre du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
+                                    {
+                                        if (matrice_jeu_imaginaire[colonne_decalage + i, index] == '_') underscore_apres = true;
+                                        if (matrice_jeu_imaginaire[colonne_decalage + i, index] != '_') MotApres += matrice_jeu_imaginaire[colonne_decalage + i, index];
+                                    }
+                                    MotFinal = MotAvant + matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] + MotApres;
+                                    if (MotFinal.Length == 1) horizontalement_correct = true; //permet d'éviter l'erreur si on a juste un mot d'une longueur 1, qui n'est pas reconnu par le dictionnaire
+                                    else
+                                    {
+                                        horizontalement_correct = dictionnaire.RechDico(MotFinal); //On teste si le mot est verticalement correct
+                                    }
+                                }
+                                #endregion
+
+                                if (horizontalement_correct) possible = true;
+                            }
                         }
                     }
-
                     else Console.WriteLine("Il vous manque les jetons pour compléter le mot !");
                 }
                 else Console.WriteLine("Entrez soit :\n-'h' : direction horizontale\n-'v' : direction verticale");
@@ -546,7 +614,6 @@ namespace Scrables___TDG
                     }
                     
                 }
-
                 #endregion
                 #region Calcul du score 
                 //Cas horizontal
@@ -736,6 +803,194 @@ namespace Scrables___TDG
                 chars[j] = c;
             }
             return new string(chars);
+        }
+
+        public bool ToucheMot(string mot ,int ligne, int colonne, char direction)
+        {
+            bool tag_touche = false;
+            if (direction == 'h')
+            {
+                for (int i = 0; i < mot.Length && !tag_touche; i++)
+                {
+                    #region Première lettre
+                    if (i == 0)
+                    {
+                        if (colonne != 0 && ligne != 14 && ligne != 0 && colonne != 14)
+                        {
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche 
+                            if (matrice_jeu[ligne-1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne+1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                        if (colonne == 0 && ligne != 0 && ligne != 14)
+                        {
+                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                        if(colonne == 0 && ligne == 0)
+                        {
+                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                        if (colonne == 0 && ligne == 14)
+                        {
+                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                        }
+                        if (colonne != 0 && ligne == 14)
+                        {
+                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche 
+                        }
+                        if (colonne != 0 && ligne == 0)
+                        {
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche 
+                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                    }
+                    #endregion
+                    #region Dernière lettre
+                    if (i == mot.Length - 1)
+                    {
+                        if (colonne != 14 && ligne != 14 && ligne != 0 && colonne != 0)
+                        {
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                        if (colonne != 0 && colonne != 14 && ligne == 14)
+                        {
+                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
+                        }
+                        if (colonne == 14 && ligne != 0 && ligne != 14)
+                        {
+                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                        if (colonne == 14 && ligne == 0)
+                        {
+                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                        if (colonne == 14 && ligne == 14)
+                        {
+                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                        }
+                        if (colonne != 14 && ligne == 0)
+                        {
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                    }
+                    #endregion
+                    else if (i != 0 && i != mot.Length - 1)
+                    {
+                        if (ligne == 14)
+                        {
+                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus  
+                        }
+                        if (ligne == 0)
+                        {
+                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                        if (ligne != 14 && ligne != 0)
+                        {
+                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                    }
+                    
+                }
+            }
+            else
+            {
+                for (int i = 0; i < mot.Length && !tag_touche; i++)
+                {
+                    #region Première lettre
+                    if (i == 0)
+                    {
+                        if (colonne != 0 && ligne != 14 && ligne != 0 && colonne != 14)
+                        {
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche 
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite
+                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                        }
+                        if (colonne == 0 && ligne != 0 && ligne != 14)
+                        {
+                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite
+                        }
+                        if (colonne == 0 && ligne == 0)
+                        {
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite
+                        }
+                        if (colonne == 14 && ligne == 0)
+                        {
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche 
+                        }
+                        if (colonne == 14 && ligne != 0)
+                        {
+                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche 
+                        }
+                        if (colonne != 0 && ligne == 0 && colonne != 14)
+                        {
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche 
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite
+                        }
+                    }
+                    #endregion
+                    #region Dernière lettre
+                    if (i == mot.Length - 1)
+                    {
+                        if (colonne != 14 && ligne != 14 && ligne != 0 && colonne != 0)
+                        {
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche 
+                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                        if (colonne != 0 && colonne != 14 && ligne == 14)
+                        {
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche 
+                        }
+                        if (colonne == 14 && ligne != 0 && ligne != 14)
+                        {
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche  
+                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                        if (colonne == 14 && ligne == 14)
+                        {
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche
+                        }
+                        if (colonne == 0 && ligne == 14)
+                        {
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite  
+                        }
+                        if (colonne == 0 && ligne != 14)
+                        {
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                        }
+                    }
+                    #endregion
+                    else if (i != 0 && i != mot.Length - 1)
+                    {
+                        if (colonne == 14)
+                        {
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche  
+                        }
+                        if (colonne == 0)
+                        {
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
+                        }
+                        if (colonne != 14 && colonne != 0)
+                        {
+                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche  
+                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
+                        }
+                    }
+
+                }
+            }
+            return tag_touche;
         }
         #endregion
 

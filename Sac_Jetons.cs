@@ -131,7 +131,24 @@ namespace Scrables___TDG
             }
             return jeton_considere;
         }
-
+        public Jeton Convert_To_Jeton(char jeton)
+        {
+            Jeton jeton_considere;
+            string nom = "";
+            int valeur = 0;
+            int nombre = 0;
+            for (int i = 0; i < sac_jetons.Count; i++)
+            {
+                if (Convert.ToString(jeton) == sac_jetons.ElementAt(i).Value.Nom_jeton)
+                {
+                    nom = sac_jetons.ElementAt(i).Value.Nom_jeton;
+                    valeur = sac_jetons.ElementAt(i).Value.Valeur_jeton;
+                    nombre = sac_jetons.ElementAt(i).Value.Nombre_jeton;
+                }
+            }
+            jeton_considere = new Jeton(nom, valeur, nombre);
+            return jeton_considere;
+        }
         public List<Jeton> Retourne_liste()
         {
             List<Jeton> liste_retourne = new List<Jeton>(7);
@@ -140,7 +157,7 @@ namespace Scrables___TDG
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("E")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("O")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("E")).Value);
-            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("C")).Value);
+            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("*")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("T")).Value);
             return liste_retourne;
         }

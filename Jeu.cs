@@ -63,9 +63,7 @@ namespace Scrables___TDG
             monplateau.WriteFile("Instancetest.txt","InstanceScoreTest.txt", false);
 
             //Rajouter un static List<string> qui récupère le nom de toutes les parties créée pour pouvoir sélectrionner les joueurs + l'instance du plateau correspondante à la bonne partie
-            //Rajouter la possibilité de poser un joker. Changer dans le test_plateau.
-            //Le joker peut-être automatiquement assigné à la position des lettres manquantes. Si imaginons pour luter il manque U E R, et que il possède 
-            // E R dans sa main et un *, alors le programme demande "Il vous manque une lettre mais vous possédez un joker. Voulez-vous l'utiiser ?", si oui alors il complète directement à la position du U en consumant le *
+            //Rajouter la possibilité de poser un joker. Changer dans le test_plateau.    
         }
 
 
