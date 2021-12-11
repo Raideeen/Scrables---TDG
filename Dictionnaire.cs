@@ -130,24 +130,6 @@ namespace Scrables___TDG
             }
             lecture.Close();
         }
-
-        //public string toString() code obsolète pour afficher tout le dictionnaire 
-        //{
-        //    string langue_utilise = $"Le dictionnaire utilisé est ici : {langue}";
-        //    string retour = "";
-        //    for (int i = 0; i < listeMots_taille.Count; i++)
-        //    {
-        //        int int_key = listeMots_taille.ElementAt(i).Key;
-        //        List<string> list_value = listeMots_taille.ElementAt(i).Value;
-        //        retour += $"Liste des mots d'une longueur de {int_key}\n";
-        //        for (int index = 0; index < listeMots_taille.ElementAt(i).Value.Count; index++)
-        //        {
-        //            retour += $"{listeMots_taille.ElementAt(i).Value[index]} ";
-        //        }
-        //        retour += "\n";
-        //    }
-        //    return retour;
-        //}
         #endregion
     }
 }

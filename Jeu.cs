@@ -43,49 +43,13 @@ namespace Scrables___TDG
 
             //Console.WriteLine(dico.toString());
             //Console.WriteLine(dico.RechDico("REELISAIT".ToUpper()));
-
-
-            //// Get an array with the values of ConsoleColor enumeration members.
-            //ConsoleColor[] colors = (ConsoleColor[])ConsoleColor.GetValues(typeof(ConsoleColor));
-            //// Save the current background and foreground colors.
-            //ConsoleColor currentBackground = Console.BackgroundColor;
-            //ConsoleColor currentForeground = Console.ForegroundColor;
-
-            //// Display all foreground colors except the one that matches the background.
-            //Console.WriteLine("All the foreground colors except {0}, the background color:",
-            //                  currentBackground);
-            //foreach (var color in colors)
-            //{
-            //    if (color == currentBackground) continue;
-
-            //    Console.ForegroundColor = color;
-            //    Console.WriteLine("   The foreground color is {0}.", color);
-            //}
-            //Console.WriteLine();
-            //// Restore the foreground color.
-            //Console.ForegroundColor = currentForeground;
-
-            //// Display each background color except the one that matches the current foreground color.
-            //Console.WriteLine("All the background colors except {0}, the foreground color:",
-            //                  currentForeground);
-            //foreach (var color in colors)
-            //{
-            //    if (color == currentForeground) continue;
-
-            //    Console.BackgroundColor = color;
-            //    Console.WriteLine("   The background color is {0}.", color);
-            //}
-
-            //// Restore the original console colors.
-            //Console.ResetColor();
-            //Console.WriteLine("\nOriginal colors restored...");
             #endregion
             Dictionnaire dictionnaire = new Dictionnaire("Francais.txt");
             Sac_Jetons sac_jetons = new Sac_Jetons("Jetons.txt");
             Joueur Robert = new Joueur("Robert", sac_jetons, "test");
             Joueur[] joueurs = { Robert };
             Robert.Jeton_joueur_ToString();
-            Plateau monplateau = new Plateau(dictionnaire, joueurs, "InstancePlateau.txt");
+            Plateau monplateau = new Plateau(dictionnaire, joueurs, sac_jetons,"InstancePlateau.txt", "InstancePlateauScore.txt");
             //monplateau.AffichageMatriceStringBrut();
             monplateau.toStringCouleur();
 
@@ -96,7 +60,14 @@ namespace Scrables___TDG
             Console.WriteLine(monplateau.Test_Plateau("VOLE", 1, 1, 'v', Robert));
             
             monplateau.toStringCouleur();
-            monplateau.WriteFile("Instancetest.txt", false);
+            monplateau.WriteFile("Instancetest.txt","InstanceScoreTest.txt", false);
+
+            //Rajouter un static List<string> qui récupère le nom de toutes les parties créée pour pouvoir sélectrionner les joueurs + l'instance du plateau correspondante à la bonne partie
+            //Rajouter la possibilité de poser un joker. Changer dans le test_plateau.
+            //Le joker peut-être automatiquement assigné à la position des lettres manquantes. Si imaginons pour luter il manque U E R, et que il possède 
+            // E R dans sa main et un *, alors le programme demande "Il vous manque une lettre mais vous possédez un joker. Voulez-vous l'utiiser ?", si oui alors il complète directement à la position du U en consumant le *
         }
+
+
     }
 }

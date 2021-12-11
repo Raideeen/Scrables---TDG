@@ -12,7 +12,9 @@ namespace Scrables___TDG
         //Variable d'instance ou champ d'instance
         private Dictionnaire dictionnaire;
         private Joueur[] joueurs;
+        private Sac_Jetons sac_jetons;
         private string InstancePlateau_chemin;
+        private int[,] matrice_score = new int[15, 15];
         private char[,] matrice_jeu = new char[15,15];
         private char[,] matrice_jeu_imaginaire = new char[15, 15];
         private bool nouvelle_partie;
@@ -34,18 +36,24 @@ namespace Scrables___TDG
                                { 0,0,3,0,0,0,1,0,1,0,0,0,3,0,0},
                                { 0,3,0,0,0,2,0,0,0,2,0,0,0,3,0},
                                { 4,0,0,1,0,0,0,4,0,0,0,1,0,0,4}};
+                                //1 : Lettre double
+                                //2 : Lettre triple
+                                //3 : Mot compte double
+                                //4 : Mot compte triple
         public Plateau(Dictionnaire dictionnaire, Joueur[] joueurs) //Constructeur d'une nouvelle partie
         {
             this.dictionnaire = dictionnaire;
             this.joueurs = joueurs;
         }
 
-        public Plateau(Dictionnaire dictionnaire, Joueur[] joueurs, string InstancePlateau_chemin)
+        public Plateau(Dictionnaire dictionnaire, Joueur[] joueurs, Sac_Jetons sac_jetons,string InstancePlateau_chemin, string InstanceScore_chemin)
         {
             this.dictionnaire = dictionnaire;
             this.joueurs = joueurs;
             this.InstancePlateau_chemin = InstancePlateau_chemin;
-            this.ReadFile(InstancePlateau_chemin);
+            this.sac_jetons = sac_jetons;
+            this.ReadFileMatricePlateau(InstancePlateau_chemin);
+            this.ReadFileMatriceScore(InstanceScore_chemin);
         }
 
         #region Propriétés 
@@ -114,7 +122,7 @@ namespace Scrables___TDG
                 for (int j = 0; j < 15; j++)
                 {
                     Console.ForegroundColor = ConsoleColor.Black;
-                    switch (matrice_affichage[i, j])
+                    switch (matrice_score[i, j])
                     {
                         case 0:
                             Console.BackgroundColor = ConsoleColor.Green;
@@ -122,12 +130,12 @@ namespace Scrables___TDG
                             Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 1:
-                            Console.BackgroundColor = ConsoleColor.DarkCyan;
+                            Console.BackgroundColor = ConsoleColor.Cyan;
                             Console.Write($" {matrice_jeu[i, j]} ");
                             Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 2:
-                            Console.BackgroundColor = ConsoleColor.DarkBlue;
+                            Console.BackgroundColor = ConsoleColor.Blue;
                             Console.Write($" {matrice_jeu[i, j]} ");
                             Console.BackgroundColor = ConsoleColor.Black;
                             break;
@@ -142,8 +150,28 @@ namespace Scrables___TDG
                             Console.BackgroundColor = ConsoleColor.Black;
                             break;
                         case 5:
+                            Console.BackgroundColor = ConsoleColor.DarkCyan;
+                            Console.Write($" {matrice_jeu[i, j]} ");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            break;
+                        case 6:
+                            Console.BackgroundColor = ConsoleColor.Blue;
+                            Console.Write($" {matrice_jeu[i, j]} ");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            break;
+                        case 7:
+                            Console.BackgroundColor = ConsoleColor.DarkMagenta;
+                            Console.Write($" {matrice_jeu[i, j]} ");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            break;
+                        case 8:
+                            Console.BackgroundColor = ConsoleColor.DarkRed;
+                            Console.Write($" {matrice_jeu[i, j]} ");
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            break;
+                        case 9:
                             Console.BackgroundColor = ConsoleColor.Yellow;
-                            Console.Write(" " + $"{matrice_jeu[i, j]}" + " ");
+                            Console.Write($" {matrice_jeu[i, j]} ");
                             Console.BackgroundColor = ConsoleColor.Black;
                             break;
                     }  
@@ -162,7 +190,7 @@ namespace Scrables___TDG
         /// </summary>
         /// <param name="fichier">Variable indiquant le chemin du fichier et son nom. Si pas de chemin spécifié écrire seulement
         /// le nom du fichier et il sera créé dans le répertoire "bin\Debug\net5.0" de la solution</param>
-        public void ReadFile(string fichier)
+        public void ReadFileMatricePlateau(string fichier)
         {
             StreamReader lecture = new StreamReader(fichier);
             string ligne = lecture.ReadLine();
@@ -179,9 +207,26 @@ namespace Scrables___TDG
                 ligne = lecture.ReadLine();
             }
         }
+        public void ReadFileMatriceScore(string fichier)
+        {
+            StreamReader lecture = new StreamReader(fichier);
+            string ligne = lecture.ReadLine();
+            int nb_ligne = 0;
+            while (ligne != null)
+            {
+                string[] liste = ligne.Split(';');
+                for (int ligne_matrice = 0; ligne_matrice < 15; ligne_matrice++)
+                {
+                    matrice_score[nb_ligne, ligne_matrice] = Convert.ToInt32(liste[ligne_matrice]);
+                }
+                nb_ligne++;
+                ligne = lecture.ReadLine();
+            }
+        }
 
         /// <summary>
-        /// Fonction qui permet d'écrire le fichier contenant le plateau et le placement des lettres. 
+        /// Fonction qui permet d'écrire le fichier contenant le plateau et le placement des lettres mais aussi la matrice_score qui 
+        /// permettra de déterminer si un bonus à été utiliser ou pas. 
         /// Il y a distinctions de deux cas : 
         /// - nouvelle_partie == true : on fait un plateau vierge de mots
         /// - nouvelle_partie == false : on écrit le plateau dans un fichier sauvegarde qui sera re-utilisé pour une autre partie
@@ -190,18 +235,18 @@ namespace Scrables___TDG
         /// le nom du fichier et il sera créé dans le répertoire "bin\Debug\net5.0" de la solution</param>
         /// <param name="nouvelle_partie">Variable qui permet de choisir si on créé un plateau vierge ou un plateau
         /// de sauvegarde</param>
-        public void WriteFile(string fichier, bool nouvelle_partie)
+        public void WriteFile(string fichier_InstancePlateau,string fichier_InstanceScore, bool nouvelle_partie)
         {
-            StreamWriter writer = new StreamWriter(fichier);
-            
+            StreamWriter writer_plateau = new StreamWriter(fichier_InstancePlateau);
+            StreamWriter writer_score = new StreamWriter(fichier_InstanceScore);
             if (nouvelle_partie)
             {
                 for (int ligne = 0; ligne < 15; ligne++)
                 {
                     for (int colonne = 0; colonne < 15; colonne++)
                     {
-                        if (colonne == 14) writer.Write("_\n");
-                        else writer.Write("_;");
+                        if (colonne == 14) writer_plateau.Write("_\n");
+                        else writer_plateau.Write("_;");
                     }
                 }
             }
@@ -211,12 +256,21 @@ namespace Scrables___TDG
                 {
                     for (int colonne = 0; colonne < 15; colonne++)
                     {
-                        if (colonne == 14) writer.Write($"{this.matrice_jeu[ligne, colonne]}\n");
-                        else writer.Write($"{this.matrice_jeu[ligne, colonne]};");
+                        if (colonne == 14)
+                        {
+                            writer_plateau.Write($"{this.matrice_jeu[ligne, colonne]}\n");
+                            writer_score.Write($"{this.matrice_score[ligne, colonne]}\n");
+                        }
+                        else
+                        {
+                            writer_plateau.Write($"{this.matrice_jeu[ligne, colonne]};");
+                            writer_score.Write($"{this.matrice_score[ligne, colonne]};");
+                        }
                     }
                 }
             }
-            writer.Close();
+            writer_plateau.Close();
+            writer_score.Close();
         }
 
         /// <summary>
@@ -242,6 +296,9 @@ namespace Scrables___TDG
             int colonne_decalage = colonne - 1;
             //ligne et colonne représente la position du DEBUT DU MOT
             bool possible = false;
+            //Multiplicateur
+            int multiplicateur_horizontal = 1;
+            int multiplicateur_vertical = 1;
             //Cas 'h'
             string MotAvant_h = "";
             string MotApres_h = "";
@@ -254,6 +311,7 @@ namespace Scrables___TDG
             int score_vertical = 0;
 
             string motCopie = mot;
+            List<int> PositionLettreManquante = new List<int>();
             List<string> LettrePresente = new List<string>();
             List<char> LettreManquante = new List<char>();
             Queue<char> LettreManquante_sousQueue = new Queue<char>();
@@ -302,7 +360,12 @@ namespace Scrables___TDG
 
                         for (int i = 0; i < mot.Length; i++) //Boucle qui permet de remplir les cases imaginaires avec les lettres manquantes du mot
                         {
-                            if (matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] == '_') matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] = LettreManquante_sousQueue.Dequeue();
+                            if (matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] == '_')
+                            {
+                                matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] = LettreManquante_sousQueue.Dequeue();
+                                PositionLettreManquante.Add(colonne_decalage + i);
+
+                            }
                         }
 
                         #region Test : est-ce que la combinaison de mot créé par le placement du mot, avant et après celui-ci appartient au dictionnaire ?
@@ -396,7 +459,12 @@ namespace Scrables___TDG
 
                         for (int i = 0; i < mot.Length; i++) //Boucle qui permet de remplir les cases imaginaires avec les lettres manquantes du mot
                         {
-                            if (matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] == '_') matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] = LettreManquante_sousQueue.Dequeue();
+                            if (matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] == '_')
+                            {
+                                matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] = LettreManquante_sousQueue.Dequeue();
+                                PositionLettreManquante.Add(ligne_decalage + i);
+                            }
+                            
                         }
 
                         #region Test : est-ce que la combinaison de mot créé par le placement du mot, avant et après celui-ci appartient au dictionnaire ?
@@ -472,12 +540,86 @@ namespace Scrables___TDG
                 //Cas horizontal
                 if (direction == 'h')
                 {
+                    #region Calcul des points du mot de base
+                    for (int i = 0; i < mot.Length; i++) //On ajoute le score du mot de base, horizontalement SANS MUTLIPLICATEUR DE MOT
+                    {
+                        int jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[ligne_decalage, colonne_decalage + i])); //Récupère l'index dans le sac_jetons de la lettre considérée
+                        if (matrice_score[ligne_decalage, colonne_decalage + i] == 3) multiplicateur_horizontal *= 2;
+                        if (matrice_score[ligne_decalage, colonne_decalage + i] == 4) multiplicateur_horizontal *= 3;
+                        if (matrice_score[ligne_decalage, colonne_decalage + i] == 1) //Si la i-ème lettre est sur un lettre compte double
+                        {
+                            matrice_score[ligne_decalage, colonne_decalage + i] = 5; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte double utilisée"
+                            score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton*2; //On ajoute la valeur de la lettre mutipliée par 2
+                        }
+                        if (matrice_score[ligne_decalage, colonne_decalage + i] == 2)
+                        {
+                            matrice_score[ligne_decalage, colonne_decalage + i] = 6; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte triple utilisée"
+                            score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton*3; //On ajoute la valeur de la lettre mutipliée par 3
+                        }
+                        if (matrice_score[ligne_decalage, colonne_decalage + i] == 0)
+                        {
+                            score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
+                        }
+                    }
+                    #endregion
 
+                    #region Calcul des points des combinaisons de nouveaux mots à partir des lettres manquantes 
+                    for (int j = 0; j < PositionLettreManquante.Count; j++) //On parcourt seulement les positions des lettres manquantes ajoutés qui forme des nouvelles combinaisons de mots SANS MUTLIPLICATEUR
+                    {
+                        int jeton_considere = 0;
+                        multiplicateur_vertical = 1;
+                        bool underscore_haut = false;
+                        bool underscore_bas = false;
+                        for (int index = ligne_decalage - 1; index > 0 && !underscore_haut; index--) //On se place à la i-ème lettre manquante du mot, et on monte jusqu'à croiser un underscore tout en ajoutant le score de chaque lettre avec les multiplicateurs
+                        {
+                            jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[index, PositionLettreManquante[j]])); //Récupère l'index dans le sac_jetons de la lettre considérée
+                            if (matrice_jeu[index, PositionLettreManquante[j]] == '_') underscore_haut = true;
+                            if (matrice_score[index, PositionLettreManquante[j]] == 3) multiplicateur_vertical *= 2;
+                            if (matrice_score[index, PositionLettreManquante[j]] == 4) multiplicateur_vertical *= 3;
+                            if (matrice_jeu[index, PositionLettreManquante[j]] != '_' && matrice_score[index, PositionLettreManquante[j]] == 1)
+                            {
+                                matrice_score[index, PositionLettreManquante[j]] = 5; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte double utilisée"
+                                score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton*2; //On ajoute la valeur de la lettre mutipliée par 2
+                            }
+                            if (matrice_jeu[index, PositionLettreManquante[j]] != '_' && matrice_score[index, PositionLettreManquante[j]] == 2)
+                            {
+                                matrice_score[index, PositionLettreManquante[j]] = 6; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte triple utilisée"
+                                score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton * 2; //On ajoute la valeur de la lettre mutipliée par 3
+                            }
+                            if (matrice_jeu[index, PositionLettreManquante[j]] != '_') score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
+                        }
+                        for (int index = ligne_decalage + 1; index < 15 && !underscore_bas; index++) //On se place à la i-ème lettre manquante du mot, et on descend jusqu'à croiser un underscore tout en ajoutant le score de chaque lettre
+                        {
+                            jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[index, PositionLettreManquante[j]])); //Récupère l'index dans le sac_jetons de la lettre considérée
+                            if (matrice_jeu[index, PositionLettreManquante[j]] == '_') underscore_bas = true;
+                            if (matrice_score[index, PositionLettreManquante[j]] == 3) multiplicateur_vertical *= 2;
+                            if (matrice_score[index, PositionLettreManquante[j]] == 4) multiplicateur_vertical *= 3;
+                            if (matrice_jeu[index, PositionLettreManquante[j]] != '_' && matrice_score[index, PositionLettreManquante[j]] == 1)
+                            {
+                                matrice_score[index, PositionLettreManquante[j]] = 5; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte double utilisée"
+                                score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton * 2; //On ajoute la valeur de la lettre mutipliée par 2
+                            }
+                            if (matrice_jeu[index, PositionLettreManquante[j]] != '_' && matrice_score[index, PositionLettreManquante[j]] == 2)
+                            {
+                                matrice_score[index, PositionLettreManquante[j]] = 6; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte triple utilisée"
+                                score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton * 2; //On ajoute la valeur de la lettre mutipliée par 3
+                            }
+                            if (matrice_jeu[index, PositionLettreManquante[j]] != '_') score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
+                        }
+                        score_vertical *= multiplicateur_vertical;
+                    }
+                    #endregion
+                    joueur.Add_Score(score_horizontal*multiplicateur_horizontal + score_vertical); //On ajoute le score final du joueur en multipliant vert
                 }
                 //Cas vertical
                 else
                 {
-
+                    for (int i = 0; i < mot.Length; i++) //On ajoute le score du mot de base, verticalement 
+                    {
+                        int jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[ligne_decalage + i, colonne_decalage])); //Récupère l'index dans le sac_jetons de la lettre considérée
+                        score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton; //On ajoute la valeur de la lettre
+                        //rajouter les conditions if (ligne_decalage == 0 && colonne_decalage + i == 0) = mot compte triple...
+                    }
                 }
                 #endregion
             }
