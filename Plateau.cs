@@ -366,7 +366,6 @@ namespace Scrables___TDG
                             {
                                 matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] = LettreManquante_sousQueue.Dequeue();
                                 PositionLettreManquante.Add(colonne_decalage + i);
-
                             }
                         }
 
@@ -533,6 +532,22 @@ namespace Scrables___TDG
             if (possible) //On recopie la matrice_imaginaire dans la matrice_jeu 
             {
                 this.matrice_jeu = CopieMatrice(this.matrice_jeu, this.matrice_jeu_imaginaire);
+                #region On retire les jetons de la main du joueur
+                foreach (char element in LettreManquante)
+                {
+                    bool tag = false;
+                    for (int i = 0; i < joueur.Jeton_joueur.Count && !tag; i++)
+                    {
+                        if (Convert.ToString(element) == joueur.Jeton_joueur[i].Nom_jeton)
+                        {
+                            tag = true;
+                            joueur.Jeton_joueur.RemoveAt(i);
+                        }
+                    }
+                    
+                }
+
+                #endregion
                 #region Calcul du score 
                 //Cas horizontal
                 if (direction == 'h')
