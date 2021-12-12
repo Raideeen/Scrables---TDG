@@ -155,7 +155,7 @@ namespace Scrables___TDG
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("R")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("U")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("E")).Value);
-            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("O")).Value);
+            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("G")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("E")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("*")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("*")).Value);

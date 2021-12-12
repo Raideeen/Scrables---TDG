@@ -4,6 +4,10 @@ namespace Scrables___TDG
 {
     public class Jeu
     {
+        //Variable d'instance ou champ d'instance
+        private Dictionnaire mondico;
+        private Plateau monplateau;
+        private Sac_Jetons sac_jetons;
         static void Main(string[] args)
         {
             #region test temporaire
@@ -55,7 +59,7 @@ namespace Scrables___TDG
 
 
             monplateau.AffichageMatriceStringBrut();
-            Console.WriteLine(monplateau.Test_Plateau("LUTER", 15, 3, 'h', Robert));
+            //Console.WriteLine(monplateau.Test_Plateau("LUTER", 15, 3, 'h', Robert));
 
             Console.WriteLine(monplateau.Test_Plateau("VOLE", 1, 1, 'v', Robert));
             
