@@ -11,7 +11,7 @@ namespace Scrables___TDG
     {
         //Variable d'instance ou champ d'instance
         private Dictionnaire dictionnaire;
-        private Joueur[] joueurs;
+        private List<Joueur> joueurs;
         private Sac_Jetons sac_jetons;
         private string InstancePlateau_chemin;
         private int[,] matrice_score = new int[15, 15];
@@ -20,13 +20,13 @@ namespace Scrables___TDG
         private bool nouvelle_partie;
 
         
-        public Plateau(Dictionnaire dictionnaire, Joueur[] joueurs) //Constructeur d'une nouvelle partie
+        public Plateau(Dictionnaire dictionnaire, List<Joueur> joueurs) //Constructeur d'une nouvelle partie
         {
             this.dictionnaire = dictionnaire;
             this.joueurs = joueurs;
         }
 
-        public Plateau(Dictionnaire dictionnaire, Joueur[] joueurs, Sac_Jetons sac_jetons,string InstancePlateau_chemin, string InstanceScore_chemin)
+        public Plateau(Dictionnaire dictionnaire, List<Joueur> joueurs, Sac_Jetons sac_jetons,string InstancePlateau_chemin, string InstanceScore_chemin) //Plateau de nouvelle partie
         {
             this.dictionnaire = dictionnaire;
             this.joueurs = joueurs;
@@ -88,7 +88,9 @@ namespace Scrables___TDG
                 }
             }
         }
-
+        /// <summary>
+        /// Affichage de la matrice_jeu avec les couleurs indiquées par les valeurs [i,j] de la matrice_score. C'est jolie ! 
+        /// </summary>
         public void toStringCouleur()
         {
             for (int i = 1; i <= 15 ; i++)

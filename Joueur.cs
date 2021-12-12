@@ -33,7 +33,7 @@ namespace Scrables___TDG
             this.WriteFile($"{nom_joueur}.txt"); //On créé l'instance du joueur avec les caractéristiques en début de partie
         }
 
-        public Joueur(string nom_joueur, Sac_Jetons sac_jeton, string test)
+        public Joueur(string nom_joueur, Sac_Jetons sac_jeton, bool JoueurTest)
         {
             this.nom_joueur = nom_joueur;
             this.sac_jeton = sac_jeton;
@@ -50,6 +50,7 @@ namespace Scrables___TDG
         public List<Jeton> Jeton_joueur
         {
             get { return this.jeton_joueur; }
+            set { this.jeton_joueur = value; }
         }
 
         #endregion
@@ -146,12 +147,14 @@ namespace Scrables___TDG
             s += $"Nom joueur: {this.nom_joueur}\nScore: {this.score_joueur}\nMot(s) joueur: ";
             for (int i = 0; i < this.mot_joueur.Count; i++)
             {
-                s += this.mot_joueur[i] + " ";
+                if (i == this.mot_joueur.Count - 1) s += $"{this.mot_joueur[i]}";
+                else s += $"{this.mot_joueur[i]} ";
             }
             s += "\nJetons joueur: ";
             for (int i = 0; i < this.jeton_joueur.Count; i++)
             {
-                s += $"{this.jeton_joueur[i].Nom_jeton} ";
+                if (i == this.jeton_joueur.Count - 1) s += $"{this.jeton_joueur[i].Nom_jeton}";
+                else s += $"{this.jeton_joueur[i].Nom_jeton} ";
             }
             return s;
         }

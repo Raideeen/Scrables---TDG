@@ -170,16 +170,20 @@ namespace Scrables___TDG
                 this.nb_jetonTotal += sac_jetons.ElementAt(i).Value.Nombre_jeton;
             }
         }
+        /// <summary>
+        /// Fonction utilisée dans le test unitaire afin de pouvoir vérifier si les fonctions marchent
+        /// </summary>
+        /// <returns></returns>
         public List<Jeton> Retourne_liste()
         {
             List<Jeton> liste_retourne = new List<Jeton>(7);
-            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("R")).Value);
+            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("A")).Value);
+            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("B")).Value);
+            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("C")).Value);
+            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("D")).Value);
+            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("E")).Value);
             liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("U")).Value);
-            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("E")).Value);
-            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("G")).Value);
-            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("E")).Value);
-            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("*")).Value);
-            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("*")).Value);
+            liste_retourne.Add(sac_jetons.ElementAt(sac_jetons.IndexOfKey("R")).Value);
             return liste_retourne;
         }
         #endregion
