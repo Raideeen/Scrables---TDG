@@ -14,27 +14,47 @@ namespace Scrables___TDG
         private List<Joueur> joueurs;
         private Sac_Jetons sac_jetons;
         private string InstancePlateau_chemin;
+        private string InstanceScore_chemin;
         private int[,] matrice_score = new int[15, 15];
         private char[,] matrice_jeu = new char[15,15];
         private char[,] matrice_jeu_imaginaire = new char[15, 15];
         private bool nouvelle_partie;
+        private string nom_partie;
 
-        
-        public Plateau(Dictionnaire dictionnaire, List<Joueur> joueurs) //Constructeur d'une nouvelle partie
+        #region Constructeurs
+
+        public Plateau(Dictionnaire dictionnaire, List<Joueur> joueurs, Sac_Jetons sac_jetons,string InstancePlateau_chemin, string InstanceScore_chemin, string nom_partie, bool nouvelle_partie) //Plateau de nouvelle partie
         {
             this.dictionnaire = dictionnaire;
             this.joueurs = joueurs;
-        }
-
-        public Plateau(Dictionnaire dictionnaire, List<Joueur> joueurs, Sac_Jetons sac_jetons,string InstancePlateau_chemin, string InstanceScore_chemin) //Plateau de nouvelle partie
-        {
-            this.dictionnaire = dictionnaire;
-            this.joueurs = joueurs;
-            this.InstancePlateau_chemin = InstancePlateau_chemin;
             this.sac_jetons = sac_jetons;
+            this.InstancePlateau_chemin = InstancePlateau_chemin;
+            this.InstanceScore_chemin = InstanceScore_chemin;
+            this.nom_partie = nom_partie;
+            if (nouvelle_partie)
+            {
+                this.WriteFile($"Fichier\\{nom_partie}\\{InstancePlateau_chemin}", $"Fichier\\{ nom_partie}\\{InstanceScore_chemin}", true);
+                this.ReadFileMatricePlateau($"Fichier\\{nom_partie}\\{InstancePlateau_chemin}");
+                this.ReadFileMatriceScore(InstanceScore_chemin);
+            }
+            else
+            {
+                this.ReadFileMatricePlateau($"Fichier\\{nom_partie}\\{InstancePlateau_chemin}");
+                this.ReadFileMatriceScore($"Fichier\\{nom_partie}\\{InstanceScore_chemin}");
+            }
+        }
+        public Plateau(Dictionnaire dictionnaire, List<Joueur> joueurs, Sac_Jetons sac_jetons, string InstancePlateau_chemin, string InstanceScore_chemin, bool test) //Plateau de test unitaire
+        {
+            this.dictionnaire = dictionnaire;
+            this.joueurs = joueurs;
+            this.sac_jetons = sac_jetons;
+            this.InstancePlateau_chemin = InstancePlateau_chemin;
+            this.InstanceScore_chemin = InstanceScore_chemin;
             this.ReadFileMatricePlateau(InstancePlateau_chemin);
             this.ReadFileMatriceScore(InstanceScore_chemin);
         }
+
+        #endregion
 
         #region Propriétés 
 
@@ -91,7 +111,7 @@ namespace Scrables___TDG
         /// <summary>
         /// Affichage de la matrice_jeu avec les couleurs indiquées par les valeurs [i,j] de la matrice_score. C'est jolie ! 
         /// </summary>
-        public void toStringCouleur()
+        public void toString()
         {
             for (int i = 1; i <= 15 ; i++)
             {
@@ -219,6 +239,10 @@ namespace Scrables___TDG
         /// de sauvegarde</param>
         public void WriteFile(string fichier_InstancePlateau,string fichier_InstanceScore, bool nouvelle_partie)
         {
+            if (!Directory.Exists($"Fichier\\{nom_partie}"))
+            {
+                Directory.CreateDirectory($"Fichier\\{nom_partie}");
+            }
             StreamWriter writer_plateau = new StreamWriter(fichier_InstancePlateau);
             StreamWriter writer_score = new StreamWriter(fichier_InstanceScore);
             if (nouvelle_partie)
@@ -229,6 +253,14 @@ namespace Scrables___TDG
                     {
                         if (colonne == 14) writer_plateau.Write("_\n");
                         else writer_plateau.Write("_;");
+                    }
+                }
+                for (int ligne = 0; ligne < 15; ligne++)
+                {
+                    for (int colonne = 0; colonne < 15; colonne++)
+                    {
+                        if (colonne == 14) writer_score.Write($"{matrice_score[ligne, colonne]}\n");
+                        else writer_score.Write($"{matrice_score[ligne, colonne]};");
                     }
                 }
             }
@@ -461,7 +493,28 @@ namespace Scrables___TDG
                     {
                         if (nb_tour == 0) //Au tour 0, le joueur doit pouvoir placer le mot au centre sans problème
                         {
-                            possible = true;
+                            bool toucheMilieu = false;
+                            for (int index = 0; index < mot.Length && !toucheMilieu; index++)
+                            {
+                                if (ligne_decalage == 7 && colonne_decalage + index == 7) toucheMilieu = true;
+                            }
+                            if (toucheMilieu)
+                            {
+                                for (int index = 0; index < LettreManquante.Count; index++) //Création de la liste des lettre manquante du mot sous forme de queue. Plus simple d'utilisation pour la prochaine boucle
+                                {
+                                    LettreManquante_sousQueue.Enqueue(LettreManquante[index]);
+                                }
+                                for (int i = 0; i < mot.Length; i++) //Boucle qui permet de remplir les cases imaginaires avec les lettres manquantes du mot
+                                {
+                                    if (matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] == '_')
+                                    {
+                                        matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] = LettreManquante_sousQueue.Dequeue();
+                                        PositionLettreManquante.Add(colonne_decalage + i);
+                                    }
+                                }
+                                possible = true;
+                            }     
+                            else Console.WriteLine("Faites en sorte qu'une lettre du mot passe par le milieu en (8,8) !");
                         }
                         else
                         {
@@ -566,7 +619,28 @@ namespace Scrables___TDG
                     {
                         if (nb_tour == 0)
                         {
-                            possible = true;
+                            bool toucheMilieu = false;
+                            for (int index = 0; index < mot.Length && !toucheMilieu; index++)
+                            {
+                                if (ligne_decalage + index == 7 && colonne_decalage == 7) toucheMilieu = true;
+                            }
+                            if (toucheMilieu)
+                            {
+                                for (int index = 0; index < LettreManquante.Count; index++) //Création de la liste des lettre manquante du mot sous forme de queue. Plus simple d'utilisation pour la prochaine boucle
+                                {
+                                    LettreManquante_sousQueue.Enqueue(LettreManquante[index]);
+                                }
+                                for (int i = 0; i < mot.Length; i++) //Boucle qui permet de remplir les cases imaginaires avec les lettres manquantes du mot
+                                {
+                                    if (matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] == '_')
+                                    {
+                                        matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] = LettreManquante_sousQueue.Dequeue();
+                                        PositionLettreManquante.Add(colonne_decalage + i);
+                                    }
+                                }
+                                possible = true;
+                            }
+                            else Console.WriteLine("Faites en sorte qu'une lettre du mot passe par le milieu en (8,8) !");
                         }
                         else
                         {
@@ -681,7 +755,7 @@ namespace Scrables___TDG
                     {
                         bool tag_1 = false;
                         bool tag_2 = false;
-                        int jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu[ligne_decalage, colonne_decalage + i])); //Récupère l'index dans le sac_jetons de la lettre considérée
+                        int jeton_considere = sac_jetons.Sac_jetons_Get.IndexOfKey(Convert.ToString(matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i])); //Récupère l'index dans le sac_jetons de la lettre considérée
                         if (matrice_score[ligne_decalage, colonne_decalage + i] == 3) multiplicateur_horizontal *= 2;
                         if (matrice_score[ligne_decalage, colonne_decalage + i] == 4) multiplicateur_horizontal *= 3;
                         if (matrice_score[ligne_decalage, colonne_decalage + i] == 1) //Si la i-ème lettre est sur un lettre compte double

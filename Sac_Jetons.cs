@@ -16,10 +16,27 @@ namespace Scrables___TDG
         private int nb_jetonTotal = 0;
         private int nb_jetonRetire = 0;
         private int nb_ligne = 0;
+        private string nom_partie;
 
         #region Constructeurs
 
-        public Sac_Jetons(string nom_de_fichier)
+        public Sac_Jetons(string nom_de_fichier, string nom_partie, bool nouvelle_partie)
+        {
+            this.sac_jetons = new SortedList<string, Jeton>();
+            this.nom_partie = nom_partie; 
+            if (nouvelle_partie)
+            {
+                this.ReadFile(nom_de_fichier);
+                this.WriteFile($"Fichier\\{nom_partie}\\{nom_de_fichier}");
+            }
+            else
+            {
+                this.ReadFile($"Fichier\\{nom_partie}\\{nom_de_fichier}");
+            }
+            this.Compte_Jeton();
+
+        }
+        public Sac_Jetons(string nom_de_fichier, bool test)
         {
             this.sac_jetons = new SortedList<string, Jeton>();
             this.Compte_Jeton();
@@ -34,7 +51,14 @@ namespace Scrables___TDG
         {
             get { return this.sac_jetons; }
         }
-
+        public int nb_jetonTotal_get
+        {
+            get { return this.nb_jetonTotal; }
+        }
+        public int nb_jetonRetire_get
+        {
+            get { return this.nb_jetonRetire; }
+        }
         #endregion
 
         #region Méthodes
@@ -94,6 +118,10 @@ namespace Scrables___TDG
         /// <param name="fichier"></param>
         public void WriteFile(string fichier)
         {
+            if (!Directory.Exists($"Fichier\\{nom_partie}"))
+            {
+                Directory.CreateDirectory($"Fichier\\{nom_partie}");
+            }
             StreamWriter writer = new StreamWriter(fichier);
             for (int i = 0; i < sac_jetons.Count; i++)
             {

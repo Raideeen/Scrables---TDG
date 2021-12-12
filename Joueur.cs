@@ -16,23 +16,42 @@ namespace Scrables___TDG
         private Sac_Jetons sac_jeton;
         private List<string> mot_joueur = null;
         private List<Jeton> jeton_joueur = new List<Jeton>(7); //Les joueurs commencent avec une main courante de 7 jetons
+        private string nom_partie;
 
         #region Constructeurs
-
-        public Joueur(string nom_joueur, Sac_Jetons sac_jeton)
+        /// <summary>
+        /// Constructeur pour créé pour initialiser un joueur 
+        /// </summary>
+        /// <param name="nom_joueur"></param>
+        /// <param name="sac_jeton"></param>
+        public Joueur(string nom_joueur, Sac_Jetons sac_jeton, string nom_partie, bool nouvelle_partie)
         {
             this.nom_joueur = nom_joueur;
             this.sac_jeton = sac_jeton;
             this.chemin_joueur = this.nom_joueur + ".txt";
             this.mot_joueur = new List<string>();
-            for (int i = 0; i < 7; i++)
+            this.nom_partie = nom_partie;
+            if (nouvelle_partie)
             {
-                Jeton jeton_considere = sac_jeton.Retire_Jeton();
-                jeton_joueur.Add(jeton_considere);
+                for (int i = 0; i < 7; i++)
+                {
+                    Jeton jeton_considere = sac_jeton.Retire_Jeton();
+                    jeton_joueur.Add(jeton_considere);
+                }
+                this.WriteFile($"Fichier\\{nom_partie}\\{nom_joueur}.txt"); //On créé l'instance du joueur avec les caractéristiques en début de partie
             }
-            this.WriteFile($"{nom_joueur}.txt"); //On créé l'instance du joueur avec les caractéristiques en début de partie
+            else
+            {
+                this.ReadFile(nom_joueur);
+            }
+            
         }
-
+        /// <summary>
+        /// Constructeur utilisé pour le projet TestUnitaire
+        /// </summary>
+        /// <param name="nom_joueur"></param>
+        /// <param name="sac_jeton"></param>
+        /// <param name="JoueurTest">Variable d'initialisation de créé un joueur avec une liste de jeton précise</param>
         public Joueur(string nom_joueur, Sac_Jetons sac_jeton, bool JoueurTest)
         {
             this.nom_joueur = nom_joueur;
@@ -40,7 +59,6 @@ namespace Scrables___TDG
             this.chemin_joueur = this.nom_joueur + ".txt";
             this.mot_joueur = new List<string>();
             jeton_joueur = sac_jeton.Retourne_liste();
-            this.WriteFile($"{nom_joueur}.txt"); //On créé l'instance du joueur avec les caractéristiques en début de partie
         }
 
         #endregion
@@ -52,13 +70,49 @@ namespace Scrables___TDG
             get { return this.jeton_joueur; }
             set { this.jeton_joueur = value; }
         }
-
+        public string Nom_Joueur
+        {
+            get { return this.nom_joueur; }
+        }
         #endregion
 
         #region Méthodes
+        public void ReadFile(string fichier)
+        {
+            StreamReader reader = new StreamReader($"Fichier\\{nom_partie}\\{fichier}.txt");
+            string ligne = reader.ReadLine();
+            string[] tab = ligne.Split(';');
+            this.nom_joueur = tab[0];
+            this.score_joueur = Convert.ToInt32(tab[1]);
+            ligne = reader.ReadLine();
+            if (ligne == null)
+            {
+                ligne = reader.ReadLine();
+            }
+            else //on lit les mots
+            {
+                tab = ligne.Split(';');
+                for (int i = 0; i < tab.Length; i++)
+                {
+                    this.mot_joueur.Add(tab[i]);
+                }
+            }
+            ligne = reader.ReadLine();
+            tab = ligne.Split(';');
+            for (int i = 0; i < tab.Length; i++)
+            {
+                Jeton jeton_considere = sac_jeton.Convert_To_Jeton(Convert.ToChar(tab[i]));
+                this.jeton_joueur.Add(jeton_considere);
+            }
+            reader.Close();
+        }
 
         public void WriteFile(string fichier)
         {
+            if (!Directory.Exists($"Fichier\\{nom_partie}"))
+            {
+                Directory.CreateDirectory($"Fichier\\{nom_partie}");
+            }
             StreamWriter writer = new StreamWriter(fichier);
             writer.WriteLine($"{nom_joueur};{score_joueur}"); //On écrit d'abord le nom_joueur puis son score
             if (mot_joueur == null)
