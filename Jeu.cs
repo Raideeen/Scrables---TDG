@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
 
 namespace Scrables___TDG
 {
@@ -8,6 +13,16 @@ namespace Scrables___TDG
         private Dictionnaire mondico;
         private Plateau monplateau;
         private Sac_Jetons sac_jetons;
+        private Joueur[] joueurs;
+        private List<string> Nom_Parties = new List<string>();
+
+        #region Constructeurs
+        public Jeu(Dictionnaire mondico, Plateau monplateau, Sac_Jetons sac_jetons)
+        {
+
+        }
+        #endregion
+
         static void Main(string[] args)
         {
             #region test temporaire
@@ -59,10 +74,11 @@ namespace Scrables___TDG
 
 
             monplateau.AffichageMatriceStringBrut();
-            //Console.WriteLine(monplateau.Test_Plateau("LUTER", 15, 3, 'h', Robert));
+            //Console.WriteLine(monplateau.Test_Plateau("LUTER", 15, 3, 'h', 1, Robert));
 
-            Console.WriteLine(monplateau.Test_Plateau("VOLE", 1, 1, 'v', Robert));
-            
+            //Console.WriteLine(dictionnaire.toString());
+            Console.WriteLine(monplateau.Test_Plateau("VOLE", 1, 1, 'v', 1,Robert));
+            Console.WriteLine(Robert.toString());
             monplateau.toStringCouleur();
             monplateau.WriteFile("Instancetest.txt","InstanceScoreTest.txt", false);
 

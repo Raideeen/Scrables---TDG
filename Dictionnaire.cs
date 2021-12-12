@@ -103,7 +103,7 @@ namespace Scrables___TDG
         public string toString()
         {
             string langue_utilise = $"Le dictionnaire utilisé est ici : {langue}";
-            string retour = "";
+            string retour = langue_utilise + "\n";
             for (int i = 0; i < listeMots_taille.Count; i++)
             {
                 int int_key = listeMots_taille.ElementAt(i).Key;

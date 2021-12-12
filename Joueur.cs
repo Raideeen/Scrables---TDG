@@ -136,7 +136,25 @@ namespace Scrables___TDG
             }
             Console.WriteLine($"Voici la liste des jetons dans la main du joueur {this.nom_joueur} : {s}");
         }
-        
+        /// <summary>
+        /// Fonction qui retourne une descriptions du joueur
+        /// </summary>
+        /// <returns></returns>
+        public string toString()
+        {
+            string s = "";
+            s += $"Nom joueur: {this.nom_joueur}\nScore: {this.score_joueur}\nMot(s) joueur: ";
+            for (int i = 0; i < this.mot_joueur.Count; i++)
+            {
+                s += this.mot_joueur[i] + " ";
+            }
+            s += "\nJetons joueur: ";
+            for (int i = 0; i < this.jeton_joueur.Count; i++)
+            {
+                s += $"{this.jeton_joueur[i].Nom_jeton} ";
+            }
+            return s;
+        }
         public string Jeton_joueur_liste()
         {
             string s = "";

@@ -13,6 +13,8 @@ namespace Scrables___TDG
         Random aleatoire = new Random();
         //Variable d'instance ou champ d'instance
         private SortedList<string, Jeton> sac_jetons;
+        private int nb_jetonTotal = 0;
+        private int nb_jetonRetire = 0;
         private int nb_ligne = 0;
 
         #region Constructeurs
@@ -20,6 +22,7 @@ namespace Scrables___TDG
         public Sac_Jetons(string nom_de_fichier)
         {
             this.sac_jetons = new SortedList<string, Jeton>();
+            this.Compte_Jeton();
             this.ReadFile(nom_de_fichier);
         }
 
@@ -116,7 +119,17 @@ namespace Scrables___TDG
             return descriptif;
         }
 
-
+        public void Ajoute_Jeton(Jeton jeton)
+        {
+            bool tag = true;
+            for (int i = 0; i < sac_jetons.Count && tag; i++)
+            {
+                if (jeton.Nom_jeton == sac_jetons.ElementAt(i).Value.Nom_jeton)
+                {
+                    sac_jetons.ElementAt(i).Value.Nombre_jeton++;
+                }
+            }
+        }
         /// <summary>
         /// Méthode pour retirer un jeton aléatoirement du sac si le nombre_jeton != 0. Il est à noter quelle retire le jeton et retourne le jeton retiré
         /// </summary>
@@ -129,6 +142,7 @@ namespace Scrables___TDG
             {
                 jeton_considere.Nombre_jeton--;
             }
+            this.nb_jetonRetire++;
             return jeton_considere;
         }
         public Jeton Convert_To_Jeton(char jeton)
@@ -148,6 +162,13 @@ namespace Scrables___TDG
             }
             jeton_considere = new Jeton(nom, valeur, nombre);
             return jeton_considere;
+        }
+        public void Compte_Jeton()
+        {
+            for (int i = 0; i < sac_jetons.Count; i++)
+            {
+                this.nb_jetonTotal += sac_jetons.ElementAt(i).Value.Nombre_jeton;
+            }
         }
         public List<Jeton> Retourne_liste()
         {
