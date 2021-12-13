@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scrables - TDG", "Scrables - TDG.csproj", "{AE6502A7-6BD0-4617-BBF9-4B7B2EDD45F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DJEBAR Adrien CARON Clément - SCRABBLE TDG", "DJEBAR Adrien CARON Clément - SCRABBLE TDG.csproj", "{AE6502A7-6BD0-4617-BBF9-4B7B2EDD45F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scrabbles_Test_Unitaire", "..\Scrabbles_Test_Unitaire\Scrabbles_Test_Unitaire.csproj", "{65D98297-17C1-4D7C-A4CF-414DBE750041}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scrabbles_Test_Unitaire", "..\Scrabble_Test_Unitaire\Scrabbles_Test_Unitaire.csproj", "{3923E2B9-4E3D-48C5-903F-7845EA6C928B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{AE6502A7-6BD0-4617-BBF9-4B7B2EDD45F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE6502A7-6BD0-4617-BBF9-4B7B2EDD45F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE6502A7-6BD0-4617-BBF9-4B7B2EDD45F4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{65D98297-17C1-4D7C-A4CF-414DBE750041}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{65D98297-17C1-4D7C-A4CF-414DBE750041}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{65D98297-17C1-4D7C-A4CF-414DBE750041}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{65D98297-17C1-4D7C-A4CF-414DBE750041}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3923E2B9-4E3D-48C5-903F-7845EA6C928B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3923E2B9-4E3D-48C5-903F-7845EA6C928B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3923E2B9-4E3D-48C5-903F-7845EA6C928B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3923E2B9-4E3D-48C5-903F-7845EA6C928B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

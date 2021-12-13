@@ -229,115 +229,22 @@ namespace Scrables___TDG
                         if (nbr_tour == 0 && Choix_passe == false)
                         {
                             Console.WriteLine("C'est le premier tour. Il faut nécessairement poser une mot qui passe par le centre en (8,8) !");
-                            Console.WriteLine("Entrez le mot que vous voulez-placer : ");
+                            Console.WriteLine();
+                            Console.WriteLine($"Vous avez {temps.Minutes} minutes pour ce tour.");
+                            Console.WriteLine("Entrez le mot que vous voulez-placer (si vous êtes bloquer et vous voulez passer votre tour tapez 'B'): ");
                             string mot_recu = Console.ReadLine();
-                            Console.WriteLine("Entrez la direction du mot (h/v) (h pour horizontale et v pour verticale): ");
-                            char direction_recu = Convert.ToChar(Console.ReadLine());
-                            Console.WriteLine("Entrez la ligne du début du mot: ");
-                            #region Test : input ligne correcte
-                            string ligne_string = Console.ReadLine();
-                            
-                            bool ligne_bool_test = false;
-                            int ligne_test = 0;
-                            int ligne_recu = 0;
-                            ligne_bool_test = int.TryParse(ligne_string, out ligne_test);
-                            while(ligne_bool_test == false)
+                            if (mot_recu == "B")
                             {
-                                Console.WriteLine("Entrez la ligne du début du mot: ");
-                                ligne_string = Console.ReadLine();
-                                ligne_bool_test = int.TryParse(ligne_string, out ligne_test);
-                            }
-                            ligne_recu = ligne_test;
-                            #endregion
-                            Console.WriteLine("Entrez la colonne du début du mot: ");
-                            #region Test : input colonne correcte
-                            string colonne_string = Console.ReadLine();
-                            bool colonne_bool_test = false;
-                            int colonne_test = 0;
-                            int colonne_recu = 0;
-                            colonne_bool_test = int.TryParse(colonne_string, out colonne_test);
-                            while (colonne_bool_test == false)
-                            {
-                                Console.WriteLine("Entrez la colonne du début du mot: ");
-                                colonne_string = Console.ReadLine();
-                                colonne_bool_test = int.TryParse(colonne_string, out colonne_test);
-                            }
-                            colonne_recu = colonne_test;
-                            #endregion
-                            if (DateTime.Now > FinDeTour)
-                            {
-                                Console.WriteLine("Temps écoulé !");
-                                TourFini = true;
+                                Choix_passe = true;
                             }
                             else
                             {
-                                bool poser = plateau.Test_Plateau(mot_recu.ToUpper(), ligne_recu, colonne_recu, direction_recu, 0, joueur_considere);
-                                while (poser == false)
-                                {
-                                    Console.WriteLine("Placement incorrect. Veuillez réessayer en tenant compte des remarques !");
-                                    Console.WriteLine();
-                                    Console.WriteLine("Entrez le mot que vous voulez-placer : ");
-                                    mot_recu = Console.ReadLine();
-                                    Console.WriteLine();
-                                    Console.WriteLine("Entrez la direction du mot (h/v) (h pour horizontale et v pour verticale): ");
-                                    direction_recu = Convert.ToChar(Console.ReadLine());
-                                    Console.WriteLine();
-                                    Console.WriteLine("Entrez la ligne du début du mot: ");
-                                    #region Test : input ligne correcte
-                                    ligne_string = Console.ReadLine();
-                                    
-                                    ligne_bool_test = false;
-                                    ligne_test = 0;
-                                    ligne_recu = 0;
-                                    ligne_bool_test = int.TryParse(ligne_string, out ligne_test);
-                                    while (ligne_bool_test == false)
-                                    {
-                                        Console.WriteLine("Entrez la ligne du début du mot: ");
-                                        ligne_string = Console.ReadLine();
-                                        ligne_bool_test = int.TryParse(ligne_string, out ligne_test);
-                                    }
-                                    ligne_recu = ligne_test;
-                                    #endregion
-                                    Console.WriteLine();
-                                    Console.WriteLine("Entrez la colonne du début du mot: ");
-                                    #region Test : input colonne correcte
-                                    colonne_string = Console.ReadLine();
-                                    colonne_bool_test = false;
-                                    colonne_test = 0;
-                                    colonne_recu = 0;
-                                    colonne_bool_test = int.TryParse(colonne_string, out colonne_test);
-                                    while (colonne_bool_test == false)
-                                    {
-                                        Console.WriteLine("Entrez la colonne du début du mot: ");
-                                        colonne_string = Console.ReadLine();
-                                        colonne_bool_test = int.TryParse(colonne_string, out colonne_test);
-                                    }                                   
-                                    colonne_recu = colonne_test;
-                                    #endregion
-                                    Console.WriteLine();
-                                    poser = plateau.Test_Plateau(mot_recu.ToUpper(), ligne_recu, colonne_recu, direction_recu, 0, joueur_considere);
-                                }
-                                Console.WriteLine("Placement réussi !");
-                                nbr_tour++;
-                            }
-                        }
-                        else if (Choix_passe == false)
-                        {
-                            if (DateTime.Now > FinDeTour)
-                            {
-                                Console.WriteLine("Temps écoulé !");
-                                TourFini = true;
-                            }
-                            else
-                            {
-                                Console.WriteLine($"C'est le tour n°{nbr_tour + 1} !");
-                                Console.WriteLine("Entrez le mot que vous voulez-placer : ");
-                                string mot_recu = Console.ReadLine();
                                 Console.WriteLine("Entrez la direction du mot (h/v) (h pour horizontale et v pour verticale): ");
                                 char direction_recu = Convert.ToChar(Console.ReadLine());
                                 Console.WriteLine("Entrez la ligne du début du mot: ");
                                 #region Test : input ligne correcte
                                 string ligne_string = Console.ReadLine();
+
                                 bool ligne_bool_test = false;
                                 int ligne_test = 0;
                                 int ligne_recu = 0;
@@ -345,14 +252,6 @@ namespace Scrables___TDG
                                 while (ligne_bool_test == false)
                                 {
                                     Console.WriteLine("Entrez la ligne du début du mot: ");
-                                    ligne_string = Console.ReadLine();
-                                    ligne_bool_test = int.TryParse(ligne_string, out ligne_test);
-                                }
-                                ligne_recu = ligne_test;
-                                if (ligne_recu > 15 || ligne_recu < 15) ligne_bool_test = false;
-                                while (ligne_bool_test == false)
-                                {
-                                    Console.WriteLine("Entrez la ligne du début du mot (compris entre 0 et 15): ");
                                     ligne_string = Console.ReadLine();
                                     ligne_bool_test = int.TryParse(ligne_string, out ligne_test);
                                 }
@@ -373,23 +272,92 @@ namespace Scrables___TDG
                                 }
                                 colonne_recu = colonne_test;
                                 #endregion
-                                bool poser = plateau.Test_Plateau(mot_recu.ToUpper(), ligne_recu, colonne_recu, direction_recu, nbr_tour, joueur_considere);
-                                while (poser == false)
+                                if (DateTime.Now > FinDeTour)
                                 {
-                                    Console.WriteLine("Placement incorrect. Veuillez réessayer en tenant compte des remarques !");
-                                    Console.WriteLine();
-                                    Console.WriteLine("Entrez le mot que vous voulez-placer : ");
-                                    mot_recu = Console.ReadLine();
-                                    Console.WriteLine();
+                                    Console.WriteLine("Temps écoulé !");
+                                    TourFini = true;
+                                }
+                                else
+                                {
+                                    bool poser = plateau.Test_Plateau(mot_recu.ToUpper(), ligne_recu, colonne_recu, direction_recu, 0, joueur_considere);
+                                    while (poser == false)
+                                    {
+                                        Console.WriteLine("Placement incorrect. Veuillez réessayer en tenant compte des remarques !");
+                                        Console.WriteLine();
+                                        Console.WriteLine("Entrez le mot que vous voulez-placer : ");
+                                        mot_recu = Console.ReadLine();
+                                        Console.WriteLine();
+                                        Console.WriteLine("Entrez la direction du mot (h/v) (h pour horizontale et v pour verticale): ");
+                                        direction_recu = Convert.ToChar(Console.ReadLine());
+                                        Console.WriteLine();
+                                        Console.WriteLine("Entrez la ligne du début du mot: ");
+                                        #region Test : input ligne correcte
+                                        ligne_string = Console.ReadLine();
+
+                                        ligne_bool_test = false;
+                                        ligne_test = 0;
+                                        ligne_recu = 0;
+                                        ligne_bool_test = int.TryParse(ligne_string, out ligne_test);
+                                        while (ligne_bool_test == false)
+                                        {
+                                            Console.WriteLine("Entrez la ligne du début du mot: ");
+                                            ligne_string = Console.ReadLine();
+                                            ligne_bool_test = int.TryParse(ligne_string, out ligne_test);
+                                        }
+                                        ligne_recu = ligne_test;
+                                        #endregion
+                                        Console.WriteLine();
+                                        Console.WriteLine("Entrez la colonne du début du mot: ");
+                                        #region Test : input colonne correcte
+                                        colonne_string = Console.ReadLine();
+                                        colonne_bool_test = false;
+                                        colonne_test = 0;
+                                        colonne_recu = 0;
+                                        colonne_bool_test = int.TryParse(colonne_string, out colonne_test);
+                                        while (colonne_bool_test == false)
+                                        {
+                                            Console.WriteLine("Entrez la colonne du début du mot: ");
+                                            colonne_string = Console.ReadLine();
+                                            colonne_bool_test = int.TryParse(colonne_string, out colonne_test);
+                                        }
+                                        colonne_recu = colonne_test;
+                                        #endregion
+                                        Console.WriteLine();
+                                        poser = plateau.Test_Plateau(mot_recu.ToUpper(), ligne_recu, colonne_recu, direction_recu, 0, joueur_considere);
+                                    }
+                                    Console.WriteLine("Placement réussi !");
+                                    nbr_tour++;
+                                }
+                            }
+                        }
+                        else if (Choix_passe == false)
+                        {
+                            if (DateTime.Now > FinDeTour)
+                            {
+                                Console.WriteLine("Temps écoulé !");
+                                TourFini = true;
+                            }
+                            else
+                            {
+                                Console.WriteLine($"C'est le tour n°{nbr_tour + 1} !");
+                                Console.WriteLine();
+                                Console.WriteLine($"Vous avez {temps.Minutes} minutes pour ce tour.");
+                                Console.WriteLine("Entrez le mot que vous voulez-placer (si vous êtes bloquer et vous voulez passer votre tour tapez 'B'): ");
+                                string mot_recu = Console.ReadLine();
+                                if (mot_recu == "B")
+                                {
+                                    Choix_passe = true;
+                                }
+                                else
+                                {
                                     Console.WriteLine("Entrez la direction du mot (h/v) (h pour horizontale et v pour verticale): ");
-                                    direction_recu = Convert.ToChar(Console.ReadLine());
-                                    Console.WriteLine();
+                                    char direction_recu = Convert.ToChar(Console.ReadLine());
                                     Console.WriteLine("Entrez la ligne du début du mot: ");
                                     #region Test : input ligne correcte
-                                    ligne_string = Console.ReadLine();
-                                    ligne_bool_test = false;
-                                    ligne_test = 0;
-                                    ligne_recu = 0;
+                                    string ligne_string = Console.ReadLine();
+                                    bool ligne_bool_test = false;
+                                    int ligne_test = 0;
+                                    int ligne_recu = 0;
                                     ligne_bool_test = int.TryParse(ligne_string, out ligne_test);
                                     while (ligne_bool_test == false)
                                     {
@@ -399,13 +367,12 @@ namespace Scrables___TDG
                                     }
                                     ligne_recu = ligne_test;
                                     #endregion
-                                    Console.WriteLine();
                                     Console.WriteLine("Entrez la colonne du début du mot: ");
                                     #region Test : input colonne correcte
-                                    colonne_string = Console.ReadLine();
-                                    colonne_bool_test = false;
-                                    colonne_test = 0;
-                                    colonne_recu = 0;
+                                    string colonne_string = Console.ReadLine();
+                                    bool colonne_bool_test = false;
+                                    int colonne_test = 0;
+                                    int colonne_recu = 0;
                                     colonne_bool_test = int.TryParse(colonne_string, out colonne_test);
                                     while (colonne_bool_test == false)
                                     {
@@ -415,15 +382,60 @@ namespace Scrables___TDG
                                     }
                                     colonne_recu = colonne_test;
                                     #endregion
-                                    Console.WriteLine();
-                                    poser = plateau.Test_Plateau(mot_recu.ToUpper(), ligne_recu, colonne_recu, direction_recu, nbr_tour, joueur_considere);
+                                    bool poser = plateau.Test_Plateau(mot_recu.ToUpper(), ligne_recu, colonne_recu, direction_recu, nbr_tour, joueur_considere);
+                                    while (poser == false)
+                                    {
+                                        Console.WriteLine("Placement incorrect. Veuillez réessayer en tenant compte des remarques !");
+                                        Console.WriteLine();
+                                        Console.WriteLine("Entrez le mot que vous voulez-placer : ");
+                                        mot_recu = Console.ReadLine();
+                                        Console.WriteLine();
+                                        Console.WriteLine("Entrez la direction du mot (h/v) (h pour horizontale et v pour verticale): ");
+                                        direction_recu = Convert.ToChar(Console.ReadLine());
+                                        Console.WriteLine();
+                                        Console.WriteLine("Entrez la ligne du début du mot: ");
+                                        #region Test : input ligne correcte
+                                        ligne_string = Console.ReadLine();
+                                        ligne_bool_test = false;
+                                        ligne_test = 0;
+                                        ligne_recu = 0;
+                                        ligne_bool_test = int.TryParse(ligne_string, out ligne_test);
+                                        while (ligne_bool_test == false)
+                                        {
+                                            Console.WriteLine("Entrez la ligne du début du mot: ");
+                                            ligne_string = Console.ReadLine();
+                                            ligne_bool_test = int.TryParse(ligne_string, out ligne_test);
+                                        }
+                                        ligne_recu = ligne_test;
+                                        #endregion
+                                        Console.WriteLine();
+                                        Console.WriteLine("Entrez la colonne du début du mot: ");
+                                        #region Test : input colonne correcte
+                                        colonne_string = Console.ReadLine();
+                                        colonne_bool_test = false;
+                                        colonne_test = 0;
+                                        colonne_recu = 0;
+                                        colonne_bool_test = int.TryParse(colonne_string, out colonne_test);
+                                        while (colonne_bool_test == false)
+                                        {
+                                            Console.WriteLine("Entrez la colonne du début du mot: ");
+                                            colonne_string = Console.ReadLine();
+                                            colonne_bool_test = int.TryParse(colonne_string, out colonne_test);
+                                        }
+                                        colonne_recu = colonne_test;
+                                        #endregion
+                                        Console.WriteLine();
+                                        poser = plateau.Test_Plateau(mot_recu.ToUpper(), ligne_recu, colonne_recu, direction_recu, nbr_tour, joueur_considere);
+                                    }
+                                    Console.WriteLine("Placement réussi !");
+                                    nbr_tour++;
                                 }
-                                Console.WriteLine("Placement réussi !");
-                                nbr_tour++;
+                                
                             }
                         }
                         nb_jetonRetire = jeu.Sac_Jetons_GetSet.nb_jetonRetire_get;
                         TourFini = true;
+                        Console.WriteLine("Fin de tour ! Appuyez sur une touche pour continuer.");
                         Console.ReadKey();
                     }
                 }

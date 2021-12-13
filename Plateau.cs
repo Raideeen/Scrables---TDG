@@ -112,6 +112,32 @@ namespace Scrables___TDG
         /// </summary>
         public void toString()
         {
+
+            #region Légende
+            Console.WriteLine();
+            Console.Write("Lettre compte double : ");
+            Console.BackgroundColor = ConsoleColor.Cyan;
+            Console.Write("    ");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.WriteLine();
+            Console.Write("Lettre compte triple : ");
+            Console.BackgroundColor = ConsoleColor.Blue;
+            Console.Write("    ");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.WriteLine();
+            Console.Write("Mot compte double : ");
+            Console.BackgroundColor = ConsoleColor.Magenta;
+            Console.Write("    ");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.WriteLine();
+            Console.Write("Mot compte triple : ");
+            Console.BackgroundColor = ConsoleColor.Red;
+            Console.Write("    ");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.WriteLine();
+            Console.WriteLine();
+            #endregion
+
             for (int i = 1; i <= 15 ; i++)
             {
                 if (i < 10) Console.Write($" {i} ");
@@ -187,7 +213,8 @@ namespace Scrables___TDG
 
         /// <summary>
         /// Fonction permettant de lire un fichier "InstancePlateau.txt" et créé une matrice de char[15,15] à partir de celle-ci
-        /// pour la manipulation dans le programme
+        /// pour la manipulation dans le programme. Permet de reprendre notamment une partie ultérieure pour garder en mémoire 
+        /// les mots poser
         /// </summary>
         /// <param name="fichier">Variable indiquant le chemin du fichier et son nom. Si pas de chemin spécifié écrire seulement
         /// le nom du fichier et il sera créé dans le répertoire "bin\Debug\net5.0" de la solution</param>
@@ -209,6 +236,12 @@ namespace Scrables___TDG
             }
             lecture.Close();
         }
+        /// <summary>
+        /// Fonction permettant de lire un fichier "InstanceScore.txt" et créé une matrice de int[15, 15] à partir de celle-ci
+        /// pour la manipulation dans le programme. Permet de reprendre notamment une partie ultérieure pour garder en mémoire
+        /// les bonus utilisés
+        /// </summary>
+        /// <param name="fichier"></param>
         public void ReadFileMatriceScore(string fichier)
         {
             StreamReader lecture = new StreamReader(fichier);
