@@ -15,9 +15,6 @@ namespace Scrables___TDG
         private Sac_Jetons sac_jetons;
         private List<Joueur> joueurs;
         private string nom_partie;
-        private static List<string> Nom_Parties = new List<string>();
-        //Propriété de classe 
-        public static List<string> Nom_Parties_Get { get { return Nom_Parties; } }
 
         #region Constructeurs
         public Jeu() //Initialisation début de partie par le constructeurs
@@ -99,14 +96,13 @@ namespace Scrables___TDG
             #region Ancienne partie
             else if (choix == "A")
             {
-                Console.WriteLine("Entrez le nom de la partie que vous voulez reprendre: ");
+                Console.WriteLine("Entrez le nom de la partie que vous voulez reprendre (voir dans bin/net5.0/Fichier pour ne pas faire d'erreur): ");
                 string nom_partie_reprise = Console.ReadLine();
                 Sac_Jetons sac_jetons_ancien = new Sac_Jetons("Jetons.txt", nom_partie_reprise, false);
-                Console.WriteLine("Entrez le nombre de joueurs qui était présent dans la partie: ");
+                Console.WriteLine($"Entrez le nombre de joueurs qui était présent dans la partie (voir dans  bin/net5.0/Fichier/{nom_partie_reprise} pour ne pas faire d'erreur): ");
                 string joueur_recu_string = Console.ReadLine();
                 int nombre_joueur_avant = 0;
                 #region Test : entrée du nombre de joueur correcte
-
                 bool mauvaise_conversion = false;
                 if (joueur_recu_string == "2" || joueur_recu_string == "3" || joueur_recu_string == "4") nombre_joueur_avant = Convert.ToInt32(joueur_recu_string);
                 else if (joueur_recu_string == "1")
@@ -143,8 +139,6 @@ namespace Scrables___TDG
                 this.nom_partie = nom_partie;
             }
             #endregion
-            //this.WriteFileNom_Parties(Nom_Parties);
-            //this.ReadFileNom_Parties("Liste_partie.txt");
         }
         #endregion
 
@@ -175,28 +169,7 @@ namespace Scrables___TDG
         }
         #endregion
 
-        #region Méthodes
-        //public void WriteFileNom_Parties(List<string> Nom_Parties)
-        //{
-        //    StreamWriter writer = new StreamWriter($"Fichier\\Liste_partie.txt");
-        //    File.WriteAllText($"Fichier\\Liste_partie.txt", String.Empty);
-        //    for (int i = 0; i < Nom_Parties.Count; i++)
-        //    {
-        //        if (i == Nom_Parties.Count - 1) writer.Write($"{Nom_Parties[i]}");
-        //        else writer.Write($"{Nom_Parties[i]};");
-        //    }
-        //}
-        //public void ReadFileNom_Parties(string fichier)
-        //{
-        //    StreamReader lecture = new StreamReader(fichier);
-        //    string ligne = lecture.ReadLine();
-        //    string[] tab = ligne.Split(';');
-        //    for (int i = 0; i < tab.Length; i++)
-        //    {
-        //        Nom_Parties.Add(tab[i]);
-        //    }
-        //}
-        #endregion
+
         static void Main(string[] args)
         {
             Jeu jeu = new Jeu();
