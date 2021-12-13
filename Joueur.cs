@@ -141,7 +141,7 @@ namespace Scrables___TDG
         public void Add_Mot(string mot)
         {
             mot_joueur.Add(mot);
-            this.WriteFile($"{nom_joueur}.txt");
+            this.WriteFile($"Fichier\\{nom_partie}\\{nom_joueur}.txt");
         }
 
         public void Add_Score(int val)
