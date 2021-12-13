@@ -12,7 +12,6 @@ namespace Scrables___TDG
         //Variable d'instance ou champ d'instance
         private string nom_joueur;
         private int score_joueur = 0;
-        private string chemin_joueur;
         private Sac_Jetons sac_jeton;
         private List<string> mot_joueur = null;
         private List<Jeton> jeton_joueur = new List<Jeton>(7); //Les joueurs commencent avec une main courante de 7 jetons
@@ -28,7 +27,6 @@ namespace Scrables___TDG
         {
             this.nom_joueur = nom_joueur;
             this.sac_jeton = sac_jeton;
-            this.chemin_joueur = this.nom_joueur + ".txt";
             this.mot_joueur = new List<string>();
             this.nom_partie = nom_partie;
             if (nouvelle_partie)
@@ -56,7 +54,6 @@ namespace Scrables___TDG
         {
             this.nom_joueur = nom_joueur;
             this.sac_jeton = sac_jeton;
-            this.chemin_joueur = this.nom_joueur + ".txt";
             this.mot_joueur = new List<string>();
             jeton_joueur = sac_jeton.Retourne_liste();
         }
@@ -73,6 +70,10 @@ namespace Scrables___TDG
         public string Nom_Joueur
         {
             get { return this.nom_joueur; }
+        }
+        public int Score_Joueur
+        {
+            get { return this.score_joueur; }
         }
         #endregion
 
@@ -135,6 +136,7 @@ namespace Scrables___TDG
             }
             writer.Close();
         }
+
 
         public void Add_Mot(string mot)
         {

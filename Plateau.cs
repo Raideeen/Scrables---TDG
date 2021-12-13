@@ -62,7 +62,6 @@ namespace Scrables___TDG
         {
             get { return matrice_jeu; }
         }
-
         #endregion
 
         #region Méthodes
@@ -208,6 +207,7 @@ namespace Scrables___TDG
                 nb_ligne++;
                 ligne = lecture.ReadLine();
             }
+            lecture.Close();
         }
         public void ReadFileMatriceScore(string fichier)
         {
@@ -224,6 +224,7 @@ namespace Scrables___TDG
                 nb_ligne++;
                 ligne = lecture.ReadLine();
             }
+            lecture.Close();
         }
 
         /// <summary>
@@ -632,10 +633,10 @@ namespace Scrables___TDG
                                 }
                                 for (int i = 0; i < mot.Length; i++) //Boucle qui permet de remplir les cases imaginaires avec les lettres manquantes du mot
                                 {
-                                    if (matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] == '_')
+                                    if (matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] == '_')
                                     {
-                                        matrice_jeu_imaginaire[ligne_decalage, colonne_decalage + i] = LettreManquante_sousQueue.Dequeue();
-                                        PositionLettreManquante.Add(colonne_decalage + i);
+                                        matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] = LettreManquante_sousQueue.Dequeue();
+                                        PositionLettreManquante.Add(ligne_decalage + i);
                                     }
                                 }
                                 possible = true;
@@ -695,14 +696,14 @@ namespace Scrables___TDG
                                         bool underscore_apres = false;
                                         for (int index = colonne_decalage - 1; index > 0 && !underscore_avant; index--) //On se place à la i-ème lettre du mot, et on recule jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotAvant
                                         {
-                                            if (matrice_jeu_imaginaire[colonne_decalage + i, index] == '_') underscore_avant = true;
-                                            if (matrice_jeu_imaginaire[colonne_decalage + i, index] != '_') MotAvant += matrice_jeu_imaginaire[colonne_decalage + i, index];
+                                            if (matrice_jeu_imaginaire[ligne_decalage + i, index] == '_') underscore_avant = true;
+                                            if (matrice_jeu_imaginaire[ligne_decalage + i, index] != '_') MotAvant += matrice_jeu_imaginaire[ligne_decalage + i, index];
                                         }
                                         MotAvant = ReverseString(MotAvant);
                                         for (int index = colonne_decalage + 1; index < 15 && !underscore_apres; index++) //On se place à la i-ème lettre du mot, et on avance jusqu'à croiser un underscore tout en ajoutant chaque lettre à MotApres
                                         {
-                                            if (matrice_jeu_imaginaire[colonne_decalage + i, index] == '_') underscore_apres = true;
-                                            if (matrice_jeu_imaginaire[colonne_decalage + i, index] != '_') MotApres += matrice_jeu_imaginaire[colonne_decalage + i, index];
+                                            if (matrice_jeu_imaginaire[ligne_decalage + i, index] == '_') underscore_apres = true;
+                                            if (matrice_jeu_imaginaire[ligne_decalage + i, index] != '_') MotApres += matrice_jeu_imaginaire[ligne_decalage + i, index];
                                         }
                                         MotFinal = MotAvant + matrice_jeu_imaginaire[ligne_decalage + i, colonne_decalage] + MotApres;
                                         if (MotFinal.Length == 1) horizontalement_correct = true; //permet d'éviter l'erreur si on a juste un mot d'une longueur 1, qui n'est pas reconnu par le dictionnaire
@@ -768,7 +769,7 @@ namespace Scrables___TDG
                             matrice_score[ligne_decalage, colonne_decalage + i] = 6; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte triple utilisée"
                             score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton * 3; //On ajoute la valeur de la lettre mutipliée par 3
                         }
-                        if ((matrice_score[ligne_decalage, colonne_decalage + i] == 3 || matrice_score[ligne_decalage, colonne_decalage + i] == 4 || matrice_score[ligne_decalage, colonne_decalage + i] == 0 || matrice_score[ligne_decalage, colonne_decalage + i] == 7 || matrice_score[ligne_decalage, colonne_decalage + i] == 8) && !tag_1 && !tag_2)
+                        if ((matrice_score[ligne_decalage, colonne_decalage + i] == 3 || matrice_score[ligne_decalage, colonne_decalage + i] == 4 || matrice_score[ligne_decalage, colonne_decalage + i] == 0 || matrice_score[ligne_decalage, colonne_decalage + i] == 7 || matrice_score[ligne_decalage, colonne_decalage + i] == 8 || matrice_score[ligne_decalage, colonne_decalage + i] == 9) && !tag_1 && !tag_2)
                         {
                             score_horizontal += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
                         }
@@ -795,7 +796,7 @@ namespace Scrables___TDG
                     #endregion
 
                     #region Ajout des mots dans la liste du joueur
-                    mot_a_rajouter += $"{mot};"; //On rajoute le mot de base
+                    mot_a_rajouter += $"{mot}"; //On rajoute le mot de base
                     for (int j = 0; j < PositionPivot.Count; j++) //On rajoute les nouveaux mots formés 
                     {
                         bool underscore_haut = false;
@@ -883,7 +884,7 @@ namespace Scrables___TDG
                             matrice_score[ligne_decalage + i, colonne_decalage] = 6; //Permet de dire que le bonus de la case est utilisé et se transforme en "Case lettre compte triple utilisée"
                             score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton * 3; //On ajoute la valeur de la lettre mutipliée par 3
                         }
-                        if ((matrice_score[ligne_decalage + i, colonne_decalage] == 0 || matrice_score[ligne_decalage + i, colonne_decalage] == 3 || matrice_score[ligne_decalage + i, colonne_decalage] == 4 || matrice_score[ligne_decalage + i, colonne_decalage] == 7 || matrice_score[ligne_decalage + i, colonne_decalage] == 8) && !tag_1 && !tag_2)
+                        if ((matrice_score[ligne_decalage + i, colonne_decalage] == 0 || matrice_score[ligne_decalage + i, colonne_decalage] == 3 || matrice_score[ligne_decalage + i, colonne_decalage] == 4 || matrice_score[ligne_decalage + i, colonne_decalage] == 7 || matrice_score[ligne_decalage + i, colonne_decalage] == 8 || matrice_score[ligne_decalage + i, colonne_decalage] == 9) && !tag_1 && !tag_2)
                         {
                             score_vertical += sac_jetons.Sac_jetons_Get.ElementAt(jeton_considere).Value.Valeur_jeton;
                         }
@@ -910,7 +911,7 @@ namespace Scrables___TDG
                     #endregion
 
                     #region Ajout des mots dans la liste du joueur
-                    mot_a_rajouter += $"{mot};"; //On rajoute le mot de base
+                    mot_a_rajouter += $"{mot}"; //On rajoute le mot de base
                     for (int j = 0; j < PositionPivot.Count; j++) //On rajoute les nouveaux mots formés 
                     {
                         string mottemp_avant = "";
@@ -1049,32 +1050,32 @@ namespace Scrables___TDG
                     {
                         if (colonne != 14 && ligne != 14 && ligne != 0 && colonne != 0)
                         {
-                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
-                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
-                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne, colonne + i + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne - 1, colonne + i] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne + 1, colonne + i] != '_') tag_touche = true; //en bas
                         }
                         if (colonne != 0 && colonne != 14 && ligne == 14)
                         {
-                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne - 1, colonne + i] != '_') tag_touche = true; //au dessus 
                             if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
                         }
                         if (colonne == 14 && ligne != 0 && ligne != 14)
                         {
-                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
-                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne - 1, colonne + i] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne + 1, colonne + i] != '_') tag_touche = true; //en bas
                         }
                         if (colonne == 14 && ligne == 0)
                         {
-                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne + 1, colonne + i] != '_') tag_touche = true; //en bas
                         }
                         if (colonne == 14 && ligne == 14)
                         {
-                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne - 1, colonne + i] != '_') tag_touche = true; //au dessus 
                         }
                         if (colonne != 14 && ligne == 0)
                         {
                             if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
-                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne + 1, colonne + i] != '_') tag_touche = true; //en bas
                         }
                     }
                     #endregion
@@ -1082,16 +1083,22 @@ namespace Scrables___TDG
                     {
                         if (ligne == 14)
                         {
-                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus  
+                            if (matrice_jeu[ligne, colonne + i + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne, colonne + i - 1] != '_') tag_touche = true; //à gauche
+                            if (matrice_jeu[ligne - 1, colonne + i] != '_') tag_touche = true; //au dessus  
                         }
                         if (ligne == 0)
                         {
-                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne, colonne + i + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne, colonne + i - 1] != '_') tag_touche = true; //à gauche 
+                            if (matrice_jeu[ligne + 1, colonne + i] != '_') tag_touche = true; //en bas
                         }
                         if (ligne != 14 && ligne != 0)
                         {
-                            if (matrice_jeu[ligne - 1, colonne] != '_') tag_touche = true; //au dessus 
-                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne, colonne + i + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne - 1, colonne + i] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne + 1, colonne + i] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne, colonne + i - 1] != '_') tag_touche = true; //à gauche 
                         }
                     }
                     
@@ -1140,32 +1147,32 @@ namespace Scrables___TDG
                     {
                         if (colonne != 14 && ligne != 14 && ligne != 0 && colonne != 0)
                         {
-                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
-                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche 
-                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne + i, colonne + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne + i, colonne - 1] != '_') tag_touche = true; //à gauche 
+                            if (matrice_jeu[ligne + i + 1, colonne] != '_') tag_touche = true; //en bas
                         }
                         if (colonne != 0 && colonne != 14 && ligne == 14)
                         {
-                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
-                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche 
+                            if (matrice_jeu[ligne + i, colonne + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne + i, colonne - 1] != '_') tag_touche = true; //à gauche 
                         }
                         if (colonne == 14 && ligne != 0 && ligne != 14)
                         {
-                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche  
-                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne + i, colonne - 1] != '_') tag_touche = true; //à gauche  
+                            if (matrice_jeu[ligne + i + 1, colonne] != '_') tag_touche = true; //en bas
                         }
                         if (colonne == 14 && ligne == 14)
                         {
-                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche
+                            if (matrice_jeu[ligne + i, colonne - 1] != '_') tag_touche = true; //à gauche
                         }
                         if (colonne == 0 && ligne == 14)
                         {
-                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite  
+                            if (matrice_jeu[ligne + i, colonne + 1] != '_') tag_touche = true; //à droite  
                         }
                         if (colonne == 0 && ligne != 14)
                         {
-                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
-                            if (matrice_jeu[ligne + 1, colonne] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne + i, colonne + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne + i + 1, colonne] != '_') tag_touche = true; //en bas
                         }
                     }
                     #endregion
@@ -1173,16 +1180,22 @@ namespace Scrables___TDG
                     {
                         if (colonne == 14)
                         {
-                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche  
+                            if (matrice_jeu[ligne + i - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne + i + 1, colonne] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne + i, colonne - 1] != '_') tag_touche = true; //à gauche  
                         }
                         if (colonne == 0)
                         {
-                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne + i - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne + i + 1, colonne] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne + i, colonne + 1] != '_') tag_touche = true; //à droite 
                         }
                         if (colonne != 14 && colonne != 0)
                         {
-                            if (matrice_jeu[ligne, colonne - 1] != '_') tag_touche = true; //à gauche  
-                            if (matrice_jeu[ligne, colonne + 1] != '_') tag_touche = true; //à droite 
+                            if (matrice_jeu[ligne + i - 1, colonne] != '_') tag_touche = true; //au dessus 
+                            if (matrice_jeu[ligne + i + 1, colonne] != '_') tag_touche = true; //en bas
+                            if (matrice_jeu[ligne + i, colonne - 1] != '_') tag_touche = true; //à gauche  
+                            if (matrice_jeu[ligne + i, colonne + 1] != '_') tag_touche = true; //à droite 
                         }
                     }
 

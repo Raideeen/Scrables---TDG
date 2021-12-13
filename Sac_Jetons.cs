@@ -109,6 +109,7 @@ namespace Scrables___TDG
                 }
                 ligne = lecture.ReadLine();
             }
+            lecture.Close();
         }
 
 
@@ -155,8 +156,9 @@ namespace Scrables___TDG
                 if (jeton.Nom_jeton == sac_jetons.ElementAt(i).Value.Nom_jeton)
                 {
                     sac_jetons.ElementAt(i).Value.Nombre_jeton++;
-                }
+                }    
             }
+            this.nb_jetonRetire--;
         }
         /// <summary>
         /// Méthode pour retirer un jeton aléatoirement du sac si le nombre_jeton != 0. Il est à noter quelle retire le jeton et retourne le jeton retiré
@@ -166,9 +168,22 @@ namespace Scrables___TDG
         {
             int nombre = aleatoire.Next(0, 27);
             Jeton jeton_considere = sac_jetons.ElementAt(nombre).Value;
-            if (jeton_considere.Nombre_jeton != 0) //On vérifie que le nombre de jeton dans le sac est différent de zéro (car sinon il ne peut pas être pris)
+            bool possible_retirer = true;
+            if (jeton_considere.Nombre_jeton > 0) //On vérifie que le nombre de jeton dans le sac est différent de zéro (car sinon il ne peut pas être pris)
             {
                 jeton_considere.Nombre_jeton--;
+            }
+            else possible_retirer = false;
+            while(possible_retirer == false)
+            {
+                nombre = aleatoire.Next(0, 27);
+                jeton_considere = sac_jetons.ElementAt(nombre).Value;
+                if (jeton_considere.Nombre_jeton > 0)
+                {
+                    jeton_considere.Nombre_jeton--;
+                    possible_retirer = true;
+                }
+                else possible_retirer = false;
             }
             this.nb_jetonRetire++;
             return jeton_considere;
